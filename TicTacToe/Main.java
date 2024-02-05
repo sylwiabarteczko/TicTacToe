@@ -13,11 +13,11 @@ public class Main {
 
         System.out.println("Welcome to the game Tic Tac Toe. ");
 
-        char [][] board = new char[2][2];
+//        char [][] board = new char[2][2];
+//
+//        for (int i = 0; i < 2; i++) {
+//            for (int j = 0; j < 2; j++);  Jeszcze nie wiem czy potrzebuje tego tutaj
 
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++);
-
-        }
     }
+}
 }
