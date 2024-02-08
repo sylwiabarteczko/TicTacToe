@@ -1,3 +1,5 @@
+package syll25.tictactoe;
+
 import java.util.Scanner;
 
 public class Main {
