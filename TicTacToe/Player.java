@@ -1,32 +1,36 @@
+import java.util.Random;
+
 public class Player {
 
-    public static void main(String[] args) {
+    public Player() {
 
-        char[] znaki = {'X', 'O'};
-        char player1 = firstCharacter(characters);
+        char[] symbols = {'X', 'O'};
+        char[] players = randomCharacter(symbols);
+        char player1 = players[0];
         char player2 = (player1 == 'X') ? 'O' : 'X';
 
         System.out.println("Player 1 you got: " + player1);
         System.out.println("Player 2 you got: " + player2);
+
+    }
+
+    private char[] randomCharacter(char[] symbols) {
+        char[] players = new char[2];
+        players[0] = randomCharacters(symbols); //to bedzie pierwszy losowy symbol dla player 1
+        players[1] = (players[0] == 'X') ? 'O' : 'X'; //w ten sposob player 2 powinien dostac drugi niewybrany wczesniej symbol?
+        return players;
     }
 
     public static char randomCharacters(char[] availableCharacters) {
         Random random = new Random();
-        char symbol = (random.nextBoolean() ? 'X' : 'O'); // Boolean?
-        char symbolChosen = availableCharacters[symbol];
-
-        char[] newBoard = new char[availableCharacters.length - 1];
-        for (int i = 0, j = 0; i < availableCharacters.length; i++) {
-            if (i !+symbol){
-                newBoard[j++] = availableCharacters[i];
-            }
-        }
-
+        int index = random.nextInt(availableCharacters.length);
+        return availableCharacters[index];
     }
 
-    public char newSymbol() {
-        return symbol;
+    public static void main(String[] args) {
+        new Player();
     }
-
 
 }
+
+
