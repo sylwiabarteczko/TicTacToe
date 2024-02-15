@@ -9,21 +9,15 @@ public class Main {
 //        Player player1 = new Player();
 //        Player player2 = new Player();
 
-        TicTacToe symbolChoice = new TicTacToe('X', 'Y', 'Z', 'O', 'S');
+        CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
         List<Character> drawSymbols = symbolChoice.drawSymbols();
 
-        char player1symbol = drawSymbols.get(0);
+        char player1symbol = symbolChoice.drawSymbol();
         System.out.println("Player 1 that is your symbol: " + player1symbol);
 
-        char player2symbol = drawSymbols.get(1);
+        char player2symbol = symbolChoice.drawSymbol();
         System.out.println("Player 2 that is your symbol: " + player2symbol);
-
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Hello Player 1, what is your name? ");
-//        String play1 = scanner.nextLine();
-//        System.out.println("Hello Player 2, what is your name? ");
-//        String play2 = scanner.nextLine();
 
 
 //        char [][] board = new char[2][2];
