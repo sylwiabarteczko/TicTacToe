@@ -13,10 +13,10 @@ public class Main {
 
         List<Character> drawSymbols = symbolChoice.drawSymbols();
 
-        char player1symbol = symbolChoice.drawSymbol();
+        char player1symbol = drawSymbols.get(0);
         System.out.println("Player 1 that is your symbol: " + player1symbol);
 
-        char player2symbol = symbolChoice.drawSymbol();
+        char player2symbol = drawSymbols.get(1);
         System.out.println("Player 2 that is your symbol: " + player2symbol);
 
 
