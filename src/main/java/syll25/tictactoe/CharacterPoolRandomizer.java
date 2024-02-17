@@ -14,23 +14,21 @@ import java.util.Random;
  */
 public class CharacterPoolRandomizer {
     private ArrayList<Character> availableSymbols;
-    private List<Character> symbols; // Bez tego podkresla na czerwono kazde slowo "symbols" z komentarzem "cannot resolve symbol"
-
     public CharacterPoolRandomizer(char... characters) {
-        symbols = new ArrayList<>();
+        availableSymbols = new ArrayList<>();
         for (char c : characters) {
-            symbols.add(c);
+            availableSymbols.add(c);
         }
 
-        if (symbols.size() != 5) {
+        if (availableSymbols.size() != 5) {
             throw new IllegalArgumentException("You need to choose one of this characters: X, Y, Z, O, S"); //nazwe wyjatku podpowiada mi program, gdy wymysle wlasna stwierdza "cannot resolve symbol"
         }
-        availableSymbols = new ArrayList<>(symbols);
+        availableSymbols = new ArrayList<>(availableSymbols);
         Collections.shuffle(availableSymbols);
     }
 
     public void addSymbols(char... characters) {
-        for (char symbol : symbols) {
+        for (char symbol : availableSymbols) {
             availableSymbols.add(symbol);
         }
     }
@@ -40,15 +38,12 @@ public class CharacterPoolRandomizer {
             throw new IllegalArgumentException("No available symbols");
         }
         int randomIndex = new Random().nextInt(availableSymbols.size());
-        char symbol = availableSymbols.remove(0);
-        return symbol;
+        return availableSymbols.removeFirst();
     }
 
     public List<Character> drawSymbols() {
         List<Character> drawnSymbols = new ArrayList<>();
-        for (char symbol : symbols) {
-            drawnSymbols.add(symbol);
-        }
+        drawnSymbols.addAll(availableSymbols);
         return drawnSymbols;
     }
 }
