@@ -23,7 +23,6 @@ public class CharacterPoolRandomizer {
         if (availableSymbols.size() != 5) {
             throw new IllegalArgumentException("You need to choose one of this characters: X, Y, Z, O, S"); //nazwe wyjatku podpowiada mi program, gdy wymysle wlasna stwierdza "cannot resolve symbol"
         }
-//        availableSymbols = new ArrayList<>(availableSymbols);
         Collections.shuffle(availableSymbols);
     }
 
@@ -39,7 +38,4 @@ public class CharacterPoolRandomizer {
         return availableSymbols.remove(randomIndex);
     }
 
-    public List<Character> drawSymbols() {
-        return new ArrayList<>(availableSymbols);
-    }
 }
