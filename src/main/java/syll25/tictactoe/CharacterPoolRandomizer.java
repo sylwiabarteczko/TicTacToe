@@ -13,7 +13,7 @@ import java.util.Random;
  * - testy jednostkowe
  */
 public class CharacterPoolRandomizer {
-    private ArrayList<Character> availableSymbols;
+    public ArrayList<Character> availableSymbols;
     public CharacterPoolRandomizer(char... characters) {
         availableSymbols = new ArrayList<>();
         for (char c : characters) {
