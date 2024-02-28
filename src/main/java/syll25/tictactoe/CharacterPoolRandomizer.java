@@ -2,8 +2,6 @@ package syll25.tictactoe;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Wymagania:
@@ -14,28 +12,21 @@ import java.util.Random;
  */
 public class CharacterPoolRandomizer {
     public ArrayList<Character> availableSymbols;
+
     public CharacterPoolRandomizer(char... characters) {
         availableSymbols = new ArrayList<>();
         for (char c : characters) {
             availableSymbols.add(c);
         }
-
-        if (availableSymbols.size() != 5) {
-            throw new IllegalArgumentException("You need to choose one of this characters: X, Y, Z, O, S"); //nazwe wyjatku podpowiada mi program, gdy wymysle wlasna stwierdza "cannot resolve symbol"
-        }
         Collections.shuffle(availableSymbols);
-    }
-
-    public void addSymbol(char symbol) {
-            availableSymbols.add(symbol);
     }
 
     public char drawSymbol() {
         if (availableSymbols.isEmpty()) {
-            throw new IllegalArgumentException("No available symbols");
+            throw new NoMoreSymbolsException();
         }
-        int randomIndex = new Random().nextInt(availableSymbols.size());
-        return availableSymbols.remove(randomIndex);
+        return availableSymbols.remove(0);
+
     }
 
 }
