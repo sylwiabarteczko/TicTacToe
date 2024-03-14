@@ -1,5 +1,6 @@
 package syll25.tictactoe;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -8,74 +9,62 @@ public class Main {
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
         Board board = new Board(symbolChoice);
-        board.initializeBoard();
         System.out.println("That is your game board: ");
         board.printBoard();
 
         if (symbolChoice.availableSymbols.size() >= 2) {
-            char player1symbol = symbolChoice.drawSymbol();
-            char player2symbol = symbolChoice.drawSymbol();
+            Player player1 = new Player(symbolChoice.drawSymbol());
+            Player player2 = new Player(symbolChoice.drawSymbol());
 
-            System.out.println("Player 1 that is your symbol: " + player1symbol);
-            System.out.println("Player 2 that is your symbol: " + player2symbol);
+            System.out.println("Player 1 that is your symbol: " + player1.getSymbol());
+            System.out.println("Player 2 that is your symbol: " + player2.getSymbol());
 
             Scanner scanner = new Scanner(System.in);
-            int row, col;
-            boolean validMove;
             boolean gameOver = false;
 
             while (!gameOver) {
-                System.out.println("Player 1, enter row and column (Your choice can be 0, 1 or 2). ");
-                do {
-                    System.out.print("Row: ");
-                    row = scanner.nextInt();
-                    System.out.print("Column: ");
-                    col = scanner.nextInt();
-                    validMove = board.placeSymbol(player1symbol, col, row);
-                    if (!validMove) {
-                        System.out.println("Invalid move, please try again. ");
-                    }
-                } while (!validMove);
-
-                board.printBoard();
-
-                if (board.checkWhoWin(player1symbol)) {
-                    System.out.println("Player 1 win!");
-                    gameOver = true;
-                    break;
-                } else if (board.isFull()) {
-                    System.out.println("We have a draw!");
-                    gameOver = true;
-                    break;
-                }
-
-                System.out.println("Player 2, enter row and column (Your choice can be 0, 1 or 2). ");
-                do {
-                    System.out.print("Row: ");
-                    row = scanner.nextInt();
-                    System.out.print("Column: ");
-                    col = scanner.nextInt();
-                    validMove = board.placeSymbol(player2symbol, col, row);
-                    if (!validMove) {
-                        System.out.println("Invalid move, please try again. ");
-                    }
-                } while (!validMove);
-
-                board.printBoard();
-                if (board.checkWhoWin(player2symbol)) {
-                    System.out.println("Player 2 win!");
-                    gameOver = true;
-                    break;
-                } else if (board.isFull()) {
-                    System.out.println("We have a draw!");
-                    gameOver = true;
-                    break;
-                }
+                gameOver = playerMove(board, scanner, player1.getSymbol());
+                if (gameOver) break;
+                gameOver = playerMove(board, scanner, player2.getSymbol());
             }
         } else {
             System.out.println("Not available symbol");
 
         }
+    }
 
+    public static boolean playerMove(Board board, Scanner scanner, char symbol) {
+        int row, col;
+        boolean validMove;
+
+        System.out.println("Player, enter row and column (Your choice can be 0, 1 or 2). ");
+        do {
+            System.out.print("Row: ");
+            row = scanner.nextInt();
+            System.out.print("Column: ");
+            col = scanner.nextInt();
+            try {
+                board.placeSymbol(symbol, row, col);
+            } catch (InvalidMoveException e) {
+                System.out.println(e.getMessage());
+                continue;
+            }
+            break;
+        } while (true);
+
+        board.printBoard();
+
+        Optional<Player> winner = board.getWinner(symbol);
+        if (winner.isPresent()) {
+            System.out.println("Player " + symbol + " wins!");
+            return true;
+        } else if (board.isFull()) {
+            System.out.println("We have a draw!");
+            return true;
+        }
+
+        return false;
     }
 }
+
+
