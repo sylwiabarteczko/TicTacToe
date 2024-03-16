@@ -1,16 +1,16 @@
 package syll25.tictactoe;
 
-import java.util.Optional;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class Board {
 
     private final Player[][] cells = new Player[3][3];
-    private final CharacterPoolRandomizer symbolChoice;
 
-    public Board(CharacterPoolRandomizer symbolChoice) {
-        this.symbolChoice = symbolChoice;
-        BoardRenderer.initializeBoard(cells);
+    public static void initializeBoard (Player[][] cells) {
+        for (Player[] row : cells) {
+            Arrays.fill(row, null);
+        }
     }
 
     public void printBoard() {
@@ -19,8 +19,8 @@ public class Board {
 
     public boolean isFull() {
         for (Player[] row : cells) {
-            for (Player cell : row) {
-                if (cell == null || cell.getSymbol() == '-') {
+            for (Player col : row) {
+                if (col == null) {
                     return false;
                 }
             }
@@ -28,14 +28,15 @@ public class Board {
         return true;
     }
 
-    public void placeSymbol(char symbol, int row, int col) {
+    public void placeSymbol(Player player, int row, int col) {
         if (row < 0 || row >= cells.length || col < 0 || col >= cells[0].length) {
             throw new InvalidMoveException("Invalid move: Out of range. ");
         }
         if (cells[row][col] != null) {
             throw new InvalidMoveException("Invalid move: Cell already occupied. ");
         }
-        cells[row][col] = new Player(symbol);
+
+        cells[row][col] = player;
     }
 
     public Optional<Player> getWinner(char symbol) {

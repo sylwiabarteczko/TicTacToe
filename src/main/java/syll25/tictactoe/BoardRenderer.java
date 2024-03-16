@@ -4,8 +4,17 @@ import java.util.Arrays;
 
 public class BoardRenderer {
     public static void renderBoard(Player[][] cells) {
-        for (Player[] row : cells) {
-            for (Player cell : row) {
+
+        System.out.print("  ");
+        for (int i = 0; i < cells[0].length; i++) {
+            System.out.print((char) ('A' + i) + " ");
+        }
+        System.out.println();
+
+        for (int i = 0; i < cells.length; i++) {
+            System.out.print(i + 1 + " ");
+            for (int j = 0; j < cells[i].length; j++) {
+                Player cell = cells[i][j];
                 if (cell == null) {
                     System.out.print("- ");
                 } else {
@@ -14,11 +23,7 @@ public class BoardRenderer {
             }
             System.out.println();
         }
+
     }
 
-    public static void initializeBoard(Player[][] cells) {
-        for (Player[] row : cells) {
-            Arrays.fill(row, null);
-        }
-    }
 }

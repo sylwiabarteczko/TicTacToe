@@ -8,7 +8,7 @@ public class Main {
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
-        Board board = new Board(symbolChoice);
+        Board board = new Board();
         System.out.println("That is your game board: ");
         board.printBoard();
 
@@ -23,9 +23,9 @@ public class Main {
             boolean gameOver = false;
 
             while (!gameOver) {
-                gameOver = playerMove(board, scanner, player1.getSymbol());
+                gameOver = playerMove(board, scanner, player1);
                 if (gameOver) break;
-                gameOver = playerMove(board, scanner, player2.getSymbol());
+                gameOver = playerMove(board, scanner, player2);
             }
         } else {
             System.out.println("Not available symbol");
@@ -33,7 +33,7 @@ public class Main {
         }
     }
 
-    public static boolean playerMove(Board board, Scanner scanner, char symbol) {
+    public static boolean playerMove(Board board, Scanner scanner, Player player) {
         int row, col;
         boolean validMove;
 
@@ -44,7 +44,7 @@ public class Main {
             System.out.print("Column: ");
             col = scanner.nextInt();
             try {
-                board.placeSymbol(symbol, row, col);
+                board.placeSymbol(player, row, col);
             } catch (InvalidMoveException e) {
                 System.out.println(e.getMessage());
                 continue;
@@ -54,9 +54,9 @@ public class Main {
 
         board.printBoard();
 
-        Optional<Player> winner = board.getWinner(symbol);
+        Optional<Player> winner = board.getWinner(player.getSymbol());
         if (winner.isPresent()) {
-            System.out.println("Player " + symbol + " wins!");
+            System.out.println("Player " + player.getSymbol() + " wins!");
             return true;
         } else if (board.isFull()) {
             System.out.println("We have a draw!");
