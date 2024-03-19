@@ -1,7 +1,5 @@
 package syll25.tictactoe;
 
-import java.util.Arrays;
-
 public class BoardRenderer {
     public static void renderBoard(Player[][] cells) {
 

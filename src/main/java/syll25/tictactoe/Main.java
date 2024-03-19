@@ -35,14 +35,24 @@ public class Main {
 
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
         int row, col;
-        boolean validMove;
 
-        System.out.println("Player, enter row and column (Your choice can be 0, 1 or 2). ");
+        System.out.println("Player, enter row and column (e.g. A1, B2): ");
         do {
-            System.out.print("Row: ");
-            row = scanner.nextInt();
-            System.out.print("Column: ");
-            col = scanner.nextInt();
+            String input = scanner.nextLine().toUpperCase();
+            if (input.length() != 2) {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc.");
+                continue;
+            }
+            char rowChar = input.charAt(0);
+            char colChar = input.charAt(1);
+
+            if (!(rowChar >= 'A' && rowChar <= 'C') || !(colChar >= '1' && colChar <= '3')) {
+                System.out.println("Invalid input. Please enter row (A-C) and column (1-3)");
+                continue;
+            }
+            row = convertRowInput(rowChar);
+            col = convertColumnInput(colChar);
+
             try {
                 board.placeSymbol(player, row, col);
             } catch (InvalidMoveException e) {
@@ -65,6 +75,16 @@ public class Main {
 
         return false;
     }
+
+    private static int convertRowInput(char input) {
+        return input - 'A';
+    }
+
+    private static int convertColumnInput(char input) {
+        return input - '1';
+    }
+
+
 }
 
 
