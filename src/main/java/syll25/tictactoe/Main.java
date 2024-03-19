@@ -77,11 +77,29 @@ public class Main {
     }
 
     private static int convertRowInput(char input) {
-        return input - 'A';
+        switch (input) {
+            case 'A':
+                return 0;
+            case 'B':
+                return 1;
+            case 'C':
+                return 2;
+            default:
+                throw new IllegalArgumentException("Invalid row input: " + input);
+        }
     }
 
     private static int convertColumnInput(char input) {
-        return input - '1';
+        switch (input) {
+            case '1':
+                return 0;
+            case '2':
+                return 1;
+            case '3':
+                return 2;
+            default:
+                throw new IllegalArgumentException("Invalid column input: " + input);
+        }
     }
 
 
