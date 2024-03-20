@@ -5,15 +5,27 @@ import java.util.Optional;
 
 public class Board {
 
-    private final Player[][] cells = new Player[3][3];
+    private final Player[][] cells;
+    private final int size;
 
-    public static void initializeBoard (Player[][] cells) {
+    public Board(int size) {
+        this.size = size;
+        this.cells = new Player[size][size]; // czy tutaj tez utworzy sie za kazdym razem nowy uzytkownik?
+        initializeBoard(cells);
+    }
+
+    public static void initializeBoard(Player[][] cells) {
         for (Player[] row : cells) {
             Arrays.fill(row, null);
         }
     }
 
+    public int getSize() {
+        return size;
+    }
+
     public void printBoard() {
+
         BoardRenderer.renderBoard(cells);
     }
 
@@ -29,7 +41,7 @@ public class Board {
     }
 
     public void placeSymbol(Player player, int row, int col) {
-        if (row < 0 || row >= cells.length || col < 0 || col >= cells[0].length) {
+        if (row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
             throw new InvalidMoveException("Invalid move: Out of range. ");
         }
         if (cells[row][col] != null) {
@@ -40,17 +52,33 @@ public class Board {
     }
 
     public Optional<Player> getWinner(char symbol) {
-        int size = cells.length;
+
         for (int i = 0; i < size; i++) {
-            if (cells[i][0] != null && cells[i][0].getSymbol() == symbol && cells[i][1] != null &&
-                    cells[i][1].getSymbol() == symbol && cells[i][2] != null && cells[i][2].getSymbol() == symbol) {
+            boolean win = true;
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j] == null || cells[i][j].getSymbol() != symbol) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) {
                 return Optional.of(cells[i][0]);
             }
-            if (cells[0][i] != null && cells[0][i].getSymbol() == symbol && cells[1][i] != null &&
-                    cells[1][i].getSymbol() == symbol && cells[2][i] != null && cells[2][i].getSymbol() == symbol) {
-                return Optional.of(cells[0][i]);
+        }
+
+        for (int j = 0; j < size; j++) {
+            boolean win = true;
+            for (int i = 0; i < size; i++) {
+                if (cells[i][j] == null || cells[i][j].getSymbol() != symbol) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) {
+                return Optional.of(cells[0][j]);
             }
         }
+
         boolean diagonal1Win = true;
         boolean diagonal2Win = true;
 
@@ -68,6 +96,8 @@ public class Board {
         if (diagonal2Win) {
             return Optional.of(cells[0][size - 1]);
         }
+
         return Optional.empty();
     }
+
 }

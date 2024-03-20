@@ -4,11 +4,14 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
+
+    private static int boardSize = 3; //podpowiada final, ale jesli chcemy miec tablice 4x4 w przyszlosci, powinna byc final?
+
     public static void main(String[] args) {
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
-        Board board = new Board();
+        Board board = new Board(boardSize);
         System.out.println("That is your game board: ");
         board.printBoard();
 
@@ -34,7 +37,7 @@ public class Main {
     }
 
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
-        int row, col;
+        int row, col;  // zmienilam tu tez kolejnosc ale nie wiem czy ma to znaczenie
 
         System.out.println("Player, enter row and column (e.g. A1, B2): ");
         do {
@@ -50,8 +53,8 @@ public class Main {
                 System.out.println("Invalid input. Please enter row (A-C) and column (1-3)");
                 continue;
             }
-            row = convertRowInput(rowChar);
-            col = convertColumnInput(colChar);
+            row = convertColumnInput(colChar); // kolejnosc zmieniona tutaj, ale nie wyglada to dobrze?
+            col = convertRowInput(rowChar);
 
             try {
                 board.placeSymbol(player, row, col);
@@ -77,29 +80,11 @@ public class Main {
     }
 
     private static int convertRowInput(char input) {
-        switch (input) {
-            case 'A':
-                return 0;
-            case 'B':
-                return 1;
-            case 'C':
-                return 2;
-            default:
-                throw new IllegalArgumentException("Invalid row input: " + input);
-        }
+        return input - 'A';
     }
 
     private static int convertColumnInput(char input) {
-        switch (input) {
-            case '1':
-                return 0;
-            case '2':
-                return 1;
-            case '3':
-                return 2;
-            default:
-                throw new IllegalArgumentException("Invalid column input: " + input);
-        }
+        return input - '1';
     }
 
 
