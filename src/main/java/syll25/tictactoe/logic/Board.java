@@ -1,4 +1,4 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -20,13 +20,8 @@ public class Board {
         }
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public void printBoard() {
-
-        BoardRenderer.renderBoard(cells);
+    public Player[][] getCells() {
+        return cells;
     }
 
     public boolean isFull() {
@@ -41,17 +36,22 @@ public class Board {
     }
 
     public void placeSymbol(Player player, int row, int col) {
-        if (row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
-            throw new InvalidMoveException("Invalid move: Out of range. ");
-        }
-        if (cells[row][col] != null) {
-            throw new InvalidMoveException("Invalid move: Cell already occupied. ");
-        }
-
+        checkValidMove(row, col);
+        checkCellOccupied(row, col);
         cells[row][col] = player;
     }
+    private void checkValidMove(int row, int col) throws OutOfRangeException {
+        if(row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
+            throw new OutOfRangeException();
+        }
+    }
+    private void checkCellOccupied(int row, int col) throws CellOccupiedException {
+        if(cells[row][col] !=null) {
+            throw new CellOccupiedException();
+        }
+    }
 
-    public Optional<Player> getWinner(char symbol) {
+    public Optional<Player> isWinner(char symbol) {
 
         for (int i = 0; i < size; i++) {
             boolean win = true;

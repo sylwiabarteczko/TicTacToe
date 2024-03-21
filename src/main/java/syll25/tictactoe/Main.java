@@ -1,5 +1,8 @@
 package syll25.tictactoe;
 
+import syll25.tictactoe.logic.*;
+import syll25.tictactoe.ui.BoardRenderer;
+
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -13,9 +16,10 @@ public class Main {
 
         Board board = new Board(boardSize);
         System.out.println("That is your game board: ");
-        board.printBoard();
 
-        if (symbolChoice.availableSymbols.size() >= 2) {
+        BoardRenderer.renderBoard(board.getCells()); //mieszaja sie, ale w klasie Main chyba powinny prawda?
+
+        try {
             Player player1 = new Player(symbolChoice.drawSymbol());
             Player player2 = new Player(symbolChoice.drawSymbol());
 
@@ -30,9 +34,8 @@ public class Main {
                 if (gameOver) break;
                 gameOver = playerMove(board, scanner, player2);
             }
-        } else {
+        } catch (NoMoreSymbolsException ex) { //"ex" jako exception powinnam dodawac za kazdym razem?
             System.out.println("Not available symbol");
-
         }
     }
 
@@ -58,16 +61,22 @@ public class Main {
 
             try {
                 board.placeSymbol(player, row, col);
-            } catch (InvalidMoveException e) {
-                System.out.println(e.getMessage());
+            } catch (InvalidMoveException ex) {
+                System.out.println(ex.getMessage());
+                continue;
+            } catch (OutOfRangeException ex) {
+                System.out.println("Invalid move: Out of range. "); //ten wyjatek zajmuje sie dokladnie tym samym co linijka 49, powinnam to zamienic?
+                continue;
+            } catch (CellOccupiedException ex) {
+                System.out.println("Invalid move: Cell already occupied. ");
                 continue;
             }
             break;
         } while (true);
 
-        board.printBoard();
+        BoardRenderer.renderBoard(board.getCells());
 
-        Optional<Player> winner = board.getWinner(player.getSymbol());
+        Optional<Player> winner = board.isWinner(player.getSymbol());
         if (winner.isPresent()) {
             System.out.println("Player " + player.getSymbol() + " wins!");
             return true;

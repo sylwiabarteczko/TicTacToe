@@ -1,4 +1,4 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 import org.junit.jupiter.api.Test;
 

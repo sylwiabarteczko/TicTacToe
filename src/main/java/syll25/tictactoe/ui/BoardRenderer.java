@@ -1,4 +1,6 @@
-package syll25.tictactoe;
+package syll25.tictactoe.ui;
+
+import syll25.tictactoe.logic.Player;
 
 public class BoardRenderer {
     public static void renderBoard(Player[][] cells) {

@@ -1,6 +1,7 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 import org.junit.jupiter.api.Test;
+import syll25.tictactoe.logic.CharacterPoolRandomizer;
 
 import java.util.Arrays;
 import java.util.HashSet;

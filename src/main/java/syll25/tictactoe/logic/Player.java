@@ -1,4 +1,4 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 public class Player {
     private final char symbol;

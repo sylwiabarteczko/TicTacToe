@@ -1,4 +1,4 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +25,7 @@ public class CharacterPoolRandomizer {
         if (availableSymbols.isEmpty()) {
             throw new NoMoreSymbolsException();
         }
-        return availableSymbols.remove(0);
+        return availableSymbols.removeFirst();
 
     }
 

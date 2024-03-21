@@ -1,4 +1,4 @@
-package syll25.tictactoe;
+package syll25.tictactoe.logic;
 
 public class InvalidMoveException extends RuntimeException {
     public InvalidMoveException(String message) {
