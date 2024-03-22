@@ -1,5 +1,8 @@
 package syll25.tictactoe.logic;
 
+import syll25.tictactoe.logic.exception.CellOccupiedException;
+import syll25.tictactoe.logic.exception.OutOfRangeException;
+
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -40,19 +43,40 @@ public class Board {
         checkCellOccupied(row, col);
         cells[row][col] = player;
     }
+
     private void checkValidMove(int row, int col) throws OutOfRangeException {
-        if(row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
+        if (row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
             throw new OutOfRangeException();
         }
     }
+
     private void checkCellOccupied(int row, int col) throws CellOccupiedException {
-        if(cells[row][col] !=null) {
+        if (cells[row][col] != null) {
             throw new CellOccupiedException();
         }
     }
 
     public Optional<Player> isWinner(char symbol) {
 
+        Optional<Player> rowWinner = checkRowWinner(symbol);
+        if (rowWinner.isPresent()) {
+            return rowWinner;
+        }
+
+        Optional<Player> columnWinner = checkColumnWinner(symbol);
+        if (columnWinner.isPresent()) {
+            return columnWinner;
+        }
+        Optional<Player> diagonalWinner = checkDiagonalWinner(symbol);
+        if (diagonalWinner.isPresent()) {
+            return diagonalWinner;
+        }
+
+        return Optional.empty();
+
+    }
+
+    private Optional<Player> checkRowWinner(char symbol) {
         for (int i = 0; i < size; i++) {
             boolean win = true;
             for (int j = 0; j < size; j++) {
@@ -65,7 +89,10 @@ public class Board {
                 return Optional.of(cells[i][0]);
             }
         }
+        return Optional.empty();
+    }
 
+    private Optional<Player> checkColumnWinner(char symbol) {
         for (int j = 0; j < size; j++) {
             boolean win = true;
             for (int i = 0; i < size; i++) {
@@ -78,7 +105,10 @@ public class Board {
                 return Optional.of(cells[0][j]);
             }
         }
+        return Optional.empty();
+    }
 
+    private Optional<Player> checkDiagonalWinner(char symbol) {
         boolean diagonal1Win = true;
         boolean diagonal2Win = true;
 
@@ -96,8 +126,6 @@ public class Board {
         if (diagonal2Win) {
             return Optional.of(cells[0][size - 1]);
         }
-
         return Optional.empty();
     }
-
 }

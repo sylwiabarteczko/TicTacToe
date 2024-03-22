@@ -1,4 +1,4 @@
-package syll25.tictactoe.logic;
+package syll25.tictactoe.logic.exception;
 
 public class CellOccupiedException extends RuntimeException {
     private static final String DEFAULT_MESSAGE2 = "Invalid move: Cell already occupied. ";

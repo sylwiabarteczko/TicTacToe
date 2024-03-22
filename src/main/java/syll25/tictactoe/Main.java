@@ -1,6 +1,10 @@
 package syll25.tictactoe;
 
 import syll25.tictactoe.logic.*;
+import syll25.tictactoe.logic.exception.CellOccupiedException;
+import syll25.tictactoe.logic.exception.InvalidMoveException;
+import syll25.tictactoe.logic.exception.NoMoreSymbolsException;
+import syll25.tictactoe.logic.exception.OutOfRangeException;
 import syll25.tictactoe.ui.BoardRenderer;
 
 import java.util.Optional;
@@ -8,7 +12,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static int boardSize = 3; //podpowiada final, ale jesli chcemy miec tablice 4x4 w przyszlosci, powinna byc final?
+    private static int boardSize = 3;
 
     public static void main(String[] args) {
 
@@ -17,7 +21,7 @@ public class Main {
         Board board = new Board(boardSize);
         System.out.println("That is your game board: ");
 
-        BoardRenderer.renderBoard(board.getCells()); //mieszaja sie, ale w klasie Main chyba powinny prawda?
+        BoardRenderer.renderBoard(board.getCells());
 
         try {
             Player player1 = new Player(symbolChoice.drawSymbol());
@@ -34,13 +38,13 @@ public class Main {
                 if (gameOver) break;
                 gameOver = playerMove(board, scanner, player2);
             }
-        } catch (NoMoreSymbolsException ex) { //"ex" jako exception powinnam dodawac za kazdym razem?
+        } catch (NoMoreSymbolsException ex) {
             System.out.println("Not available symbol");
         }
     }
 
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
-        int row, col;  // zmienilam tu tez kolejnosc ale nie wiem czy ma to znaczenie
+        int row, col;
 
         System.out.println("Player, enter row and column (e.g. A1, B2): ");
         do {
@@ -56,7 +60,7 @@ public class Main {
                 System.out.println("Invalid input. Please enter row (A-C) and column (1-3)");
                 continue;
             }
-            row = convertColumnInput(colChar); // kolejnosc zmieniona tutaj, ale nie wyglada to dobrze?
+            row = convertColumnInput(colChar);
             col = convertRowInput(rowChar);
 
             try {
@@ -65,7 +69,7 @@ public class Main {
                 System.out.println(ex.getMessage());
                 continue;
             } catch (OutOfRangeException ex) {
-                System.out.println("Invalid move: Out of range. "); //ten wyjatek zajmuje sie dokladnie tym samym co linijka 49, powinnam to zamienic?
+                System.out.println("Invalid move: Out of range. ");
                 continue;
             } catch (CellOccupiedException ex) {
                 System.out.println("Invalid move: Cell already occupied. ");

@@ -1,5 +1,7 @@
 package syll25.tictactoe.logic;
 
+import syll25.tictactoe.logic.exception.NoMoreSymbolsException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
