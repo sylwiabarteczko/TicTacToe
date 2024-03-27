@@ -51,29 +51,14 @@ public class Main {
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
         int row, col;
 
-        System.out.println(player.getName() + " enter row and column (e.g. A1, B2): ");
+        Coordinates coordinates;
+
         do {
-            String input = scanner.nextLine().toUpperCase();
+            coordinates = new Coordinates(scanner);
+            row = coordinates.getRow();
+            col = coordinates.getCol();
 
-            if (input.length() != 2) {
-                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc.");
-                continue;
-            }
-            char firstChar = input.charAt(0);
-            char secondChar = input.charAt(1);
-
-            if (Character.isLetter(firstChar) && Character.isDigit(secondChar)) {
-
-                col = convertRowInput(firstChar);
-                row = convertColumnInput(secondChar);
-
-            } else if (Character.isDigit(firstChar) && Character.isLetter(secondChar)) {
-
-                col = convertRowInput(secondChar);
-                row = convertColumnInput(firstChar);
-
-            } else {
-                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc.");
+            if (row == -1 || col == -1) {
                 continue;
             }
 
@@ -102,18 +87,8 @@ public class Main {
             System.out.println("We have a draw!");
             return true;
         }
-
         return false;
     }
-
-    private static int convertRowInput(char input) {
-        return input - 'A';
-    }
-
-    private static int convertColumnInput(char input) {
-        return input - '1';
-    }
-
 
 }
 
