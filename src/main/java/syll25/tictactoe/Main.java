@@ -18,19 +18,24 @@ public class Main {
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Player 1, enter your name: ");
+        String player1Name = scanner.nextLine();
+        System.out.println("Player 2, enter your name");
+        String player2Name = scanner.nextLine();
+
         Board board = new Board(boardSize);
         System.out.println("That is your game board: ");
 
         BoardRenderer.renderBoard(board.getCells());
 
         try {
-            Player player1 = new Player(symbolChoice.drawSymbol());
-            Player player2 = new Player(symbolChoice.drawSymbol());
+            Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
+            Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
 
-            System.out.println("Player 1 that is your symbol: " + player1.getSymbol());
-            System.out.println("Player 2 that is your symbol: " + player2.getSymbol());
+            System.out.println("Player " + player1.getName() + " that is your symbol: " + player1.getSymbol());
+            System.out.println("Player " + player2.getName() + " that is your symbol: " + player2.getSymbol());
 
-            Scanner scanner = new Scanner(System.in);
             boolean gameOver = false;
 
             while (!gameOver) {
@@ -46,7 +51,7 @@ public class Main {
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
         int row, col;
 
-        System.out.println("Player, enter row and column (e.g. A1, B2): ");
+        System.out.println(player.getName() + " enter row and column (e.g. A1, B2): ");
         do {
             String input = scanner.nextLine().toUpperCase();
 
@@ -91,7 +96,7 @@ public class Main {
 
         Optional<Player> winner = board.isWinner(player.getSymbol());
         if (winner.isPresent()) {
-            System.out.println("Player " + player.getSymbol() + " wins!");
+            System.out.println(player.getName() + player.getSymbol() + " wins!");
             return true;
         } else if (board.isFull()) {
             System.out.println("We have a draw!");
