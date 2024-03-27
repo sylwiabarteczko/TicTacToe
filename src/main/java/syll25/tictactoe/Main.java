@@ -49,19 +49,28 @@ public class Main {
         System.out.println("Player, enter row and column (e.g. A1, B2): ");
         do {
             String input = scanner.nextLine().toUpperCase();
+
             if (input.length() != 2) {
                 System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc.");
                 continue;
             }
-            char rowChar = input.charAt(0);
-            char colChar = input.charAt(1);
+            char firstChar = input.charAt(0);
+            char secondChar = input.charAt(1);
 
-            if (!(rowChar >= 'A' && rowChar <= 'C') || !(colChar >= '1' && colChar <= '3')) {
-                System.out.println("Invalid input. Please enter row (A-C) and column (1-3)");
+            if (Character.isLetter(firstChar) && Character.isDigit(secondChar)) {
+
+                col = convertRowInput(firstChar);
+                row = convertColumnInput(secondChar);
+
+            } else if (Character.isDigit(firstChar) && Character.isLetter(secondChar)) {
+
+                col = convertRowInput(secondChar);
+                row = convertColumnInput(firstChar);
+
+            } else {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc.");
                 continue;
             }
-            row = convertColumnInput(colChar);
-            col = convertRowInput(rowChar);
 
             try {
                 board.placeSymbol(player, row, col);
