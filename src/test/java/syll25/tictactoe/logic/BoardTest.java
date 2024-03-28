@@ -9,8 +9,8 @@ public class BoardTest {
     public void testIsFullPartiallyFilledBoard() {
         //given
         Board board = new Board(3);
-        Player player1 = new Player('X');
-        Player player2 = new Player('O');
+        Player player1 = new Player("Player 1", 'X');
+        Player player2 = new Player("Player 2", 'O');
         //when
         board.placeSymbol(player1, 0, 0);
         board.placeSymbol(player2, 1, 1);
@@ -19,7 +19,7 @@ public class BoardTest {
     }
 
     @Test
-    public void testIsFullEmptyBoard() { //sprawdza czy nie jest pelna na poczatku
+    public void testIsFullEmptyBoard() {
         //given
         Board board = new Board(3);
         //then

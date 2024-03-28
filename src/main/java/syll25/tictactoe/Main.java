@@ -1,10 +1,7 @@
 package syll25.tictactoe;
 
 import syll25.tictactoe.logic.*;
-import syll25.tictactoe.logic.exception.CellOccupiedException;
-import syll25.tictactoe.logic.exception.InvalidMoveException;
-import syll25.tictactoe.logic.exception.NoMoreSymbolsException;
-import syll25.tictactoe.logic.exception.OutOfRangeException;
+import syll25.tictactoe.logic.exception.*;
 import syll25.tictactoe.ui.BoardRenderer;
 
 import java.util.Optional;
@@ -19,6 +16,7 @@ public class Main {
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'Y', 'Z', 'O', 'S');
 
         Scanner scanner = new Scanner(System.in);
+
         System.out.println("Player 1, enter your name: ");
         String player1Name = scanner.nextLine();
         System.out.println("Player 2, enter your name");
@@ -39,8 +37,10 @@ public class Main {
             boolean gameOver = false;
 
             while (!gameOver) {
+                System.out.println(player1.getName() + " , enter row and column (e.g. A1, B2): ");
                 gameOver = playerMove(board, scanner, player1);
                 if (gameOver) break;
+                System.out.println(player2.getName() + " , enter row and column (e.g. A1, B2): ");
                 gameOver = playerMove(board, scanner, player2);
             }
         } catch (NoMoreSymbolsException ex) {
@@ -50,15 +50,17 @@ public class Main {
 
     public static boolean playerMove(Board board, Scanner scanner, Player player) {
         int row, col;
-
-        Coordinates coordinates;
+        String input;
 
         do {
-            coordinates = new Coordinates(scanner);
+            input = scanner.nextLine().toUpperCase();
+            Coordinates coordinates = new Coordinates(input);
+
             row = coordinates.getRow();
             col = coordinates.getCol();
 
             if (row == -1 || col == -1) {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2, etc.");
                 continue;
             }
 
@@ -73,23 +75,29 @@ public class Main {
             } catch (CellOccupiedException ex) {
                 System.out.println("Invalid move: Cell already occupied. ");
                 continue;
-            }
-            break;
-        } while (true);
-
-        BoardRenderer.renderBoard(board.getCells());
-
-        Optional<Player> winner = board.isWinner(player.getSymbol());
-        if (winner.isPresent()) {
-            System.out.println(player.getName() + player.getSymbol() + " wins!");
-            return true;
-        } else if (board.isFull()) {
-            System.out.println("We have a draw!");
-            return true;
+            } catch(InvalidCoordinatesException ex){
+            System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
+            continue;
         }
-        return false;
+        break;
+    } while(true);
+            BoardRenderer.renderBoard(board.getCells());
+
+    Optional<Player> winner = board.isWinner(player.getSymbol());
+            if(winner.isPresent())
+
+    {
+        System.out.println(player.getName() + player.getSymbol() + " wins!");
+        return true;
+    } else if(board.isFull())
+
+    {
+        System.out.println("We have a draw!");
+        return true;
+    }
+            return false;
+}
     }
 
-}
 
 

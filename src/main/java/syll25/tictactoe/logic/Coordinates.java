@@ -1,21 +1,15 @@
 package syll25.tictactoe.logic;
 
-import java.util.Scanner;
+import syll25.tictactoe.logic.exception.InvalidCoordinatesException;
 
 public class Coordinates {
     private int col;
     private int row;
 
-    public Coordinates(Scanner scanner) {
-
-        System.out.println("Enter row and column (e.g. A1, B2): ");
-        String input = scanner.nextLine().toUpperCase();
+    public Coordinates(String input) {
 
         if (input.length() != 2 || !isValidCoordinate(input)) {
-            System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
-
-            this.col = -1;
-            this.row = -1;
+            throw new InvalidCoordinatesException();
 
         } else {
 
