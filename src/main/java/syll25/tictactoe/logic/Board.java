@@ -6,7 +6,7 @@ import syll25.tictactoe.logic.exception.OutOfRangeException;
 import java.util.Arrays;
 import java.util.Optional;
 
-public class Board {
+public class Board implements GameBoard{
 
     private final Player[][] cells;
     private final int size;
@@ -17,7 +17,7 @@ public class Board {
         initializeBoard(cells);
     }
 
-    public static void initializeBoard(Player[][] cells) {
+    public void initializeBoard(Player[][] cells) {
         for (Player[] row : cells) {
             Arrays.fill(row, null);
         }
