@@ -13,7 +13,7 @@ public class Board {
 
     public Board(int size) {
         this.size = size;
-        this.cells = new Player[size][size]; // czy tutaj tez utworzy sie za kazdym razem nowy uzytkownik?
+        this.cells = new Player[size][size];
         initializeBoard(cells);
     }
 

@@ -44,7 +44,7 @@ public class Main {
                 gameOver = playerMove(board, scanner, player2);
             }
         } catch (NoMoreSymbolsException ex) {
-            System.out.println("Not available symbol");
+            System.out.println("No more symbols available. ");
         }
     }
 
@@ -75,29 +75,25 @@ public class Main {
             } catch (CellOccupiedException ex) {
                 System.out.println("Invalid move: Cell already occupied. ");
                 continue;
-            } catch(InvalidCoordinatesException ex){
-            System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
-            continue;
+            } catch (InvalidCoordinatesException ex) {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
+                continue;
+            }
+            break;
+        } while (true);
+        BoardRenderer.renderBoard(board.getCells());
+
+        Optional<Player> winner = board.isWinner(player.getSymbol());
+        if (winner.isPresent()) {
+            System.out.println(player.getName() + player.getSymbol() + " wins!");
+            return true;
+        } else if (board.isFull()) {
+            System.out.println("We have a draw!");
+            return true;
         }
-        break;
-    } while(true);
-            BoardRenderer.renderBoard(board.getCells());
-
-    Optional<Player> winner = board.isWinner(player.getSymbol());
-            if(winner.isPresent())
-
-    {
-        System.out.println(player.getName() + player.getSymbol() + " wins!");
-        return true;
-    } else if(board.isFull())
-
-    {
-        System.out.println("We have a draw!");
-        return true;
+        return false;
     }
-            return false;
 }
-    }
 
 
 
