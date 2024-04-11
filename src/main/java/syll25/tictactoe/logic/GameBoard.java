@@ -5,7 +5,6 @@ import syll25.tictactoe.logic.exception.InvalidMoveException;
 import java.util.Optional;
 
 public interface GameBoard {
-    void initializeBoard();
 
     int getSize();
 

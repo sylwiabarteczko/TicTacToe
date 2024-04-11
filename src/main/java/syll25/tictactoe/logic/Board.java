@@ -17,7 +17,7 @@ public class Board implements GameBoard {
         initializeBoard();
     }
 
-    public void initializeBoard() {
+    private void initializeBoard() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 cells[i][j] = null;

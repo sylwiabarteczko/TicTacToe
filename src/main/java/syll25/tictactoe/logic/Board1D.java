@@ -17,7 +17,6 @@ public class Board1D implements GameBoard {
         initializeBoard();
     }
 
-    @Override
     public void initializeBoard() {
         Arrays.fill(cells, null);
     }
