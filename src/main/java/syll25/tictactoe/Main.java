@@ -22,10 +22,10 @@ public class Main {
         System.out.println("Player 2, enter your name");
         String player2Name = scanner.nextLine();
 
-        Board board = new Board(boardSize);
+        GameBoard board = new Board(boardSize);
         System.out.println("That is your game board: ");
 
-        BoardRenderer.renderBoard(board.getCells());
+        BoardRenderer.renderBoard(board);
 
         try {
             Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
@@ -48,7 +48,7 @@ public class Main {
         }
     }
 
-    public static boolean playerMove(Board board, Scanner scanner, Player player) {
+    public static boolean playerMove(GameBoard board, Scanner scanner, Player player) {
         int row, col;
         String input;
 
@@ -81,7 +81,7 @@ public class Main {
             }
             break;
         } while (true);
-        BoardRenderer.renderBoard(board.getCells());
+        BoardRenderer.renderBoard(board);
 
         Optional<Player> winner = board.isWinner(player.getSymbol());
         if (winner.isPresent()) {

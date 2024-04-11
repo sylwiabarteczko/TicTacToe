@@ -1,12 +1,12 @@
 package syll25.tictactoe.logic;
 
 import syll25.tictactoe.logic.exception.CellOccupiedException;
+import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.logic.exception.OutOfRangeException;
 
-import java.util.Arrays;
 import java.util.Optional;
 
-public class Board implements GameBoard{
+public class Board implements GameBoard {
 
     private final Player[][] cells;
     private final int size;
@@ -14,19 +14,27 @@ public class Board implements GameBoard{
     public Board(int size) {
         this.size = size;
         this.cells = new Player[size][size];
-        initializeBoard(cells);
+        initializeBoard();
     }
 
-    public void initializeBoard(Player[][] cells) {
-        for (Player[] row : cells) {
-            Arrays.fill(row, null);
+    public void initializeBoard() {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                cells[i][j] = null;
+            }
         }
     }
 
-    public Player[][] getCells() {
-        return cells;
+    public int getSize() {
+        return size;
     }
 
+    @Override
+    public Optional<Player> getFieldState(int row, int col) {
+        return Optional.ofNullable(cells[row][col]);
+    }
+
+    @Override
     public boolean isFull() {
         for (Player[] row : cells) {
             for (Player col : row) {
@@ -38,24 +46,22 @@ public class Board implements GameBoard{
         return true;
     }
 
-    public void placeSymbol(Player player, int row, int col) {
+    @Override
+    public void placeSymbol(Player player, int row, int col) throws InvalidMoveException {
         checkValidMove(row, col);
-        checkCellOccupied(row, col);
+        if (cells[row][col] != null) {
+            throw new CellOccupiedException();
+        }
         cells[row][col] = player;
     }
 
     private void checkValidMove(int row, int col) throws OutOfRangeException {
-        if (row < 0 || row >= cells.length || col < 0 || col >= cells[row].length) {
+        if (row < 0 || row >= size || col < 0 || col >= size) {
             throw new OutOfRangeException();
         }
     }
 
-    private void checkCellOccupied(int row, int col) throws CellOccupiedException {
-        if (cells[row][col] != null) {
-            throw new CellOccupiedException();
-        }
-    }
-
+    @Override
     public Optional<Player> isWinner(char symbol) {
 
         Optional<Player> rowWinner = checkRowWinner(symbol);

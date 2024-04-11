@@ -2,6 +2,7 @@ package syll25.tictactoe.logic;
 
 import org.junit.jupiter.api.Test;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
+import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.logic.exception.OutOfRangeException;
 
 import java.util.Optional;
@@ -12,7 +13,7 @@ public class BoardTest {
     @Test
     public void testIsFullPartiallyFilledBoard() {
         //given
-        Board board = new Board(3);
+        GameBoard board = new Board(3);
         Player player1 = new Player("Player 1", 'X');
         Player player2 = new Player("Player 2", 'O');
         //when
@@ -25,7 +26,7 @@ public class BoardTest {
     @Test
     public void testIsFullEmptyBoard() {
         //given
-        Board board = new Board(3);
+        GameBoard board = new Board(3);
         Player player1 = new Player("Player1", 'X');
         Player player2 = new Player("Player2", 'Y');
         //when
@@ -38,13 +39,16 @@ public class BoardTest {
     public void testRowWinner() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'Z');
 
         //when
-        for (int i = 0; i < size; i++) {
-            cells[0][i] = player;
+        try {
+            for (int i = 0; i < size; i++) {
+                board.placeSymbol(player, 0, i);
+            }
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
         }
         //then
         Optional<Player> winner = board.isWinner(player.getSymbol());
@@ -56,12 +60,15 @@ public class BoardTest {
     public void testColumnWinner() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'X');
         //when
-        for (int i = 0; i < size; i++) {
-            cells[i][0] = player;
+        try {
+            for (int i = 0; i < size; i++) {
+                board.placeSymbol(player, i, 0);
+            }
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
         }
         //then
         Optional<Player> winner = board.isWinner(player.getSymbol());
@@ -73,12 +80,15 @@ public class BoardTest {
     public void testDiagonal1Winner() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'Y');
         //when
-        for (int i = 0; i < size; i++) {
-            cells[i][i] = player;
+        try {
+            for (int i = 0; i < size; i++) {
+                board.placeSymbol(player, i, i);
+            }
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
         }
         //then
         Optional<Player> winner = board.isWinner(player.getSymbol());
@@ -90,12 +100,15 @@ public class BoardTest {
     public void testDiagonal2Winner() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'X');
         //when
-        for (int i = 0; i < size; i++) {
-            board.placeSymbol(player, i, size - 1 - i);
+        try {
+            for (int i = 0; i < size; i++) {
+                board.placeSymbol(player, i, size - 1 - i);
+            }
+        } catch (InvalidMoveException e) {
+            fail("Unexcepted exception: " + e.getMessage());
         }
         //then
         Optional<Player> winner = board.isWinner(player.getSymbol());
@@ -106,8 +119,7 @@ public class BoardTest {
     public void testNoWinner() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'X');
         //when
         //then
@@ -119,8 +131,7 @@ public class BoardTest {
     public void testOutOfRangeException() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player = new Player("Player", 'Y');
         //when
         //then
@@ -137,12 +148,15 @@ public class BoardTest {
     public void testCellOccupiedException() {
         //given
         int size = 3;
-        Board board = new Board(size);
-        Player[][] cells = board.getCells();
+        GameBoard board = new Board(size);
         Player player1 = new Player("Player1", 'Z');
         Player player2 = new Player("Player2", 'Y');
         //when
-        board.placeSymbol(player1, 0, 0);
+        try {
+            board.placeSymbol(player1, 0, 0);
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
         //then
         assertThrows(CellOccupiedException.class, () -> board.placeSymbol(player2, 0, 0));
     }
@@ -152,18 +166,21 @@ public class BoardTest {
         //given
         int size = 3;
         Board board = new Board(size);
-        Player[][] cells = board.getCells();
         Player player1 = new Player("Player1", 'X');
         Player player2 = new Player("Player2", 'O');
         //when
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if ((i + j) % 2 == 0) {
-                    board.placeSymbol(player1, i, j);
-                } else {
-                    board.placeSymbol(player2, i, j);
+        try {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    if ((i + j) % 2 == 0) {
+                        board.placeSymbol(player1, i, j);
+                    } else {
+                        board.placeSymbol(player2, i, j);
+                    }
                 }
             }
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
         }
         boolean isFull = board.isFull();
         assertTrue(isFull);
@@ -174,14 +191,17 @@ public class BoardTest {
         //given
         int size = 3;
         Board board = new Board(size);
-        Player[][] cells = board.getCells();
         Player player1 = new Player("Player1", 'X');
         Player player2 = new Player("Player2", 'O');
         //when
-        board.placeSymbol(player1, 0, 0);
-        board.placeSymbol(player1, 1, 2);
-        board.placeSymbol(player2, 2, 0);
-        board.placeSymbol(player2, 0, 1);
+        try {
+            board.placeSymbol(player1, 0, 0);
+            board.placeSymbol(player1, 1, 2);
+            board.placeSymbol(player2, 2, 0);
+            board.placeSymbol(player2, 0, 1);
+        } catch (InvalidMoveException e) {
+            fail("Unexpected exception: " + e.getMessage());
+        }
         //then
         boolean isFull = board.isFull();
         assertFalse(isFull);

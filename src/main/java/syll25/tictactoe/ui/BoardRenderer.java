@@ -1,11 +1,14 @@
 package syll25.tictactoe.ui;
 
+import syll25.tictactoe.logic.GameBoard;
 import syll25.tictactoe.logic.Player;
 
+import java.util.Optional;
+
 public class BoardRenderer {
-    public static void renderBoard(Player[][] cells) {
-        renderColumnLabels(cells[0].length);
-        renderBoardContent(cells);
+    public static void renderBoard(GameBoard board) {
+        renderColumnLabels(board.getSize());
+        renderBoardContent(board);
     }
 
     private static void renderColumnLabels(int amountColumns) {
@@ -16,15 +19,15 @@ public class BoardRenderer {
         System.out.println();
     }
 
-    private static void renderBoardContent(Player[][] cells) {
-        for (int i = 0; i < cells.length; i++) {
+    private static void renderBoardContent(GameBoard board) {
+        for (int i = 0; i < board.getSize(); i++) {
             System.out.print(i + 1 + " ");
-            for (int j = 0; j < cells[i].length; j++) {
-                Player cell = cells[i][j];
-                if (cell == null) {
+            for (int j = 0; j < board.getSize(); j++) {
+                Optional<Player> cell = board.getFieldState(i, j);
+                if (cell.isEmpty()) {
                     System.out.print("- ");
                 } else {
-                    System.out.print(cell.getSymbol() + " ");
+                    System.out.print(cell.get().getSymbol() + " ");
                 }
             }
             System.out.println();

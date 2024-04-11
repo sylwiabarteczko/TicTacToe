@@ -22,12 +22,5 @@ public class PlayerTest {
         //then
         assertEquals("Player1", player.getName());
     }
-//    @Test
-//    public void testToString () {
-//        //given
-//        Player player = new Player("Player1", 'Z');
-//        //when
-//        //then
-//        assertEquals('Z', player.toString());
-//    }
+
 }

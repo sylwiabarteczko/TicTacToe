@@ -5,9 +5,15 @@ import syll25.tictactoe.logic.exception.InvalidMoveException;
 import java.util.Optional;
 
 public interface GameBoard {
-    void initializeBoard(Player[][] cells);
-    Player[][] getCells();
+    void initializeBoard();
+
+    int getSize();
+
+    Optional<Player> getFieldState(int row, int col);
+
     boolean isFull();
-    void placeSymbol(Player player,int row, int col) throws InvalidMoveException;
-    Optional<Player>isWinner(char symbol);
+
+    void placeSymbol(Player player, int row, int col) throws InvalidMoveException;
+
+    Optional<Player> isWinner(char symbol);
 }
