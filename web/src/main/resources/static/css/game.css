@@ -1,0 +1,126 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h1 {
+    color: #ff4081;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+form {
+    margin: 20px;
+}
+
+label {
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+input {
+    padding: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+form input[type="text"], form input[type="number"] {
+    width: 200px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    color: #fff;
+    background-color: #ff4081;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #e33370;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    background-color: #ddd;
+}
+
+.game-board {
+    display: inline-block;
+    margin: 20px auto;
+}
+
+table {
+    border-spacing: 10px;
+    margin: 0 auto;
+}
+
+th {
+    font-size: 24px;
+    color: #ff4081;
+}
+
+td, th {
+    padding: 10px;
+    border: 2px solid #ff4081;
+}
+
+td button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    color: #ff4081;
+    background-color: #fff;
+    border: 2px solid #ff4081;
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+td button:disabled {
+    cursor: not-allowed;
+    background-color: #eee;
+    color: #aaa;
+    border-color: #ddd;
+}
+
+td button:active {
+    background-color: #ff4081;
+    color: #fff;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2)
+}
+
+td button:hover:not(:disabled) {
+    background-color: #ffe5f0;
+    color: #ff4081;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.turn-message {
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+}
+#your-turn {
+    color: green;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+
+

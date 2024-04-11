@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Game Result</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+</head>
+<body>
+<h1>Game Result</h1>
+
+<h2 th:if="${gameStateDTO.winnerFound}" th:text="'Winner is: ' + ${gameStateDTO.currentPlayer}"></h2>
+<h2 th:if="${gameStateDTO.draw}">It's a draw!!!!!!</h2>
+
+<a th:href="@{/game/new}" class="button">Start a New Game</a>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tic Tac Toe Game</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+    <meta charset="UTF-8">
+</head>
+<body th:data-username="${#authentication.name}" th:data-game-id="${gameId}">
+
+<h1>Tic Tac Toe</h1>
+
+<div>
+    <div th:if="${gameStateDTO.gameOver}" class="game-over-message">
+        <p th:if="${gameStateDTO.winnerFound}" th:text="${gameStateDTO.currentPlayer + ' wins!'}"></p>
+        <p th:if="${!gameStateDTO.winnerFound}">It's a draw!</p>
+        <a th:href="@{/game/new}" class="button">Start a new game</a>
+    </div>
+
+    <div th:if="${!gameStateDTO.gameOver}">
+        <p>Current Player: <strong id="current-player" th:text="${gameStateDTO.currentPlayer}"></strong></p>
+
+        <p id="your-turn" th:if="${#authentication.name == gameStateDTO.currentPlayer}" style="color:green;">
+            It's your turn!
+        </p>
+        <p id="wait-turn" th:if="${#authentication.name != gameStateDTO.currentPlayer}" style="color:gray;">
+            Please wait for your turn.
+        </p>
+
+        <div class="game-board">
+            <table id="board">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th th:each="colIndex : ${#numbers.sequence(0, gameStateDTO.size - 1)}"
+                        th:text="${'A' + colIndex}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="rowIndex : ${#numbers.sequence(0, gameStateDTO.stateDTO.size - 1)}">
+                    <th th:text="${rowIndex + 1}"></th>
+                    <td th:each="colIndex : ${#numbers.sequence(0, gameStateDTO.stateDTO.size - 1)}">
+                        <button type="button"
+                                th:data-row="${rowIndex}"
+                                th:data-col="${colIndex}"
+                                th:data-game-id="${gameId}"
+                                th:disabled="${gameStateDTO.stateDTO.board[rowIndex][colIndex] != null}"
+                                th:text="${gameStateDTO.stateDTO.board[rowIndex][colIndex] != null ? gameStateDTO.stateDTO.board[rowIndex][colIndex] : ''}"
+                                th:disabled="${gameStateDTO.stateDTO.board[rowIndex][colIndex] != null
+                                                  or #authentication.name != gameStateDTO.currentPlayer}"
+                                onclick="submitMove(this)">
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const username = [[${#authentication.name}]];
+    const gameId = [[${gameId}]];
+
+    function getSafeElement(id) {
+        const element = document.getElementById(id);
+        if (!element) {
+            console.warn(`Element ${id} not found`);
+            return null;
+        }
+        return element;
+    }
+
+    async function submitMove(button) {
+        const row = button.dataset.row;
+        const col = button.dataset.col;
+
+        try {
+            const response = await fetch(`/game/move?gameId=${gameId}&row=${row}&col=${col}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error);
+            }
+
+            const newState = await response.json();
+            updateGameState(newState);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    function updateGameState(state) {
+        const board = state.stateDTO.board;
+
+        for (let row = 0; row < board.length; row++) {
+            for (let col = 0; col < board[row].length; col++) {
+                const cell = getSafeElement(`cell-${row}-${col}`);
+                if (cell) {
+                    cell.textContent = board[row][col] || '';
+                    cell.disabled = board[row][col] !== null || state.currentPlayer !== username;
+                }
+            }
+        }
+
+        const currentPlayerElement = getSafeElement("current-player");
+        const yourTurnElement = getSafeElement("your-turn");
+        const waitTurnElement = getSafeElement("wait-turn");
+
+        if (currentPlayerElement) {
+            currentPlayerElement.textContent = state.currentPlayer;
+        }
+
+        if (yourTurnElement) {
+            yourTurnElement.style.display = state.currentPlayer === username ? "block" : "none";
+        }
+
+        if (waitTurnElement) {
+            waitTurnElement.style.display = state.currentPlayer !== username ? "block" : "none";
+        }
+
+        if (state.gameOver) {
+            setTimeout(() => location.reload(), 1500);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        fetchGameState();
+
+        const pollingInterval = setInterval(fetchGameState, 2000);
+
+        function fetchGameState() {
+            fetch(`/game/${gameId}/state`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Server error');
+                    return response.json();
+                })
+                .then(state => {
+                    if (!state.gameOver) {
+                        updateGameState(state);
+                    } else {
+                        clearInterval(pollingInterval);
+                    }
+                })
+                .catch(error => console.error('Polling error:', error));
+        }
+    });
+</script>
+
+</body>
+</html>

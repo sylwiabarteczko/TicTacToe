@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Game List</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+</head>
+<body>
+<h1>Active Games</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Player 1</th>
+        <th>Player 2</th>
+        <th>Game</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="game : ${games}">
+        <td th:text="${game.id}"></td>
+        <td th:text="${game.player1Name}"></td>
+        <td th:text="${game.player2Name}"></td>
+        <td>
+            <a th:href="@{/game/{gameId}(gameId=${game.id})}">View game</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a href="/game/new" class="button">Start new game</a>
+
+</body>
+</html>

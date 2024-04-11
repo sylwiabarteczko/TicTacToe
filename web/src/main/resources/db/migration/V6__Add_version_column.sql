@@ -1,0 +1,1 @@
+ALTER TABLE game_states ADD COLUMN version BIGINT DEFAULT 0;
