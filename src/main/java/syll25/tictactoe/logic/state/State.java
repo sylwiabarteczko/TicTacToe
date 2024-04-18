@@ -1,4 +1,5 @@
 package syll25.tictactoe.logic.state;
+
 import syll25.tictactoe.logic.GameBoard;
 import syll25.tictactoe.logic.Player;
 

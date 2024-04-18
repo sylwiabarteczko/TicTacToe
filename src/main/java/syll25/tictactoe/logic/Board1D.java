@@ -62,4 +62,9 @@ public class Board1D implements GameBoard {
     public Optional<Player> isWinner(char symbol) {
         return Optional.empty();
     }
+
+    @Override
+    public Player[][] getCells() {
+        return new Player[0][];
+    }
 }

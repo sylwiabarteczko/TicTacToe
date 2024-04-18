@@ -8,8 +8,9 @@ import syll25.tictactoe.logic.exception.OutOfRangeException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class BoardTest {
+public class Board1DTest {
     @Test
     public void testIsFullPartiallyFilledBoard() {
         //given
@@ -159,6 +160,7 @@ public class BoardTest {
                 }
             }
         }
+
         boolean isFull = board.isFull();
         assertTrue(isFull);
     }
@@ -180,4 +182,6 @@ public class BoardTest {
         boolean isFull = board.isFull();
         assertFalse(isFull);
     }
+
+
 }

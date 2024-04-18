@@ -3,12 +3,11 @@ package syll25.tictactoe.ui;
 import syll25.tictactoe.logic.GameBoard;
 import syll25.tictactoe.logic.Player;
 
-import java.util.Optional;
-
 public class BoardRenderer {
     public static void renderBoard(GameBoard board) {
+        Player[][] cells = board.getCells();
         renderColumnLabels(board.getSize());
-        renderBoardContent(board);
+        renderBoardContent(cells, board.getSize());
     }
 
     private static void renderColumnLabels(int amountColumns) {
@@ -19,15 +18,14 @@ public class BoardRenderer {
         System.out.println();
     }
 
-    private static void renderBoardContent(GameBoard board) {
-        for (int i = 0; i < board.getSize(); i++) {
+    private static void renderBoardContent(Player[][] cells, int size) {
+        for (int i = 0; i < size; i++) {
             System.out.print(i + 1 + " ");
-            for (int j = 0; j < board.getSize(); j++) {
-                Optional<Player> cell = board.getFieldState(i, j);
-                if (cell.isEmpty()) {
+            for (int j = 0; j < size; j++) {
+                if (cells[i][j] == null) {
                     System.out.print("- ");
                 } else {
-                    System.out.print(cell.get().getSymbol() + " ");
+                    System.out.print(cells[i][j].getSymbol() + " ");
                 }
             }
             System.out.println();

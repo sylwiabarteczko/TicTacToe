@@ -15,4 +15,6 @@ public interface GameBoard {
     void placeSymbol(Player player, int row, int col) throws InvalidMoveException;
 
     Optional<Player> isWinner(char symbol);
+
+    Player[][] getCells();
 }
