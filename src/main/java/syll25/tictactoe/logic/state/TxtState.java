@@ -6,6 +6,16 @@ import syll25.tictactoe.logic.Player;
 import java.io.*;
 
 public class TxtState implements State {
+
+    private static final String PLAYER_DATA_SEPARATOR = ":";
+    private static final String PLAYERS_SEPARATOR = ";";
+
+    private final String filename;
+
+    public TxtState(String filename) {
+        this.filename = filename;
+    }
+
     @Override
     public void save(GameBoard board, Player player1, Player player2) {
 
@@ -14,13 +24,13 @@ public class TxtState implements State {
 
             consoleWriter.println("Saving game state to the file");
 
-            PrintWriter out = new PrintWriter(new FileWriter("gameState.txt"));
+            PrintWriter out = new PrintWriter(new FileWriter(filename));
             out.write(player1.getName());
-            out.write(":");
+            out.write(PLAYER_DATA_SEPARATOR);
             out.write(player1.getSymbol());
-            out.write(":");
+            out.write(PLAYERS_SEPARATOR);
             out.write(player2.getName());
-            out.write(":");
+            out.write(PLAYER_DATA_SEPARATOR);
             out.write(player2.getSymbol());
             out.println(board.getSize());
             out.close();
@@ -31,16 +41,16 @@ public class TxtState implements State {
     }
 
     @Override
-    public StateDTO load(String filename) {  //DTO Data Transfer Object
+    public StateDTO load() {  //DTO Data Transfer Object
 
         StateDTO stateDTO = new StateDTO("John","X","Adam", "O", null, 3 );
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
             String line1 = reader.readLine();
-            String[] players = line1.split(";");
-            String[] player1Data = players[0].split(":");
-            String[] player2Data = players[1].split(":");
+            String[] players = line1.split(PLAYERS_SEPARATOR);
+            String[] player1Data = players[0].split(PLAYER_DATA_SEPARATOR);
+            String[] player2Data = players[1].split(PLAYER_DATA_SEPARATOR);
 
             stateDTO.player1Name = player1Data[0];
             stateDTO.player1Sign = player1Data[1];

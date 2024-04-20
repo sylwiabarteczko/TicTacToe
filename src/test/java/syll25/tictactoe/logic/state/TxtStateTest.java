@@ -20,13 +20,11 @@ class TxtStateTest {
 
         StateDTO stateDTD = new StateDTO("John", "X", "Adam", "O", null, size);
 
-        TxtState state = new TxtState();
-        String filename = "GameState.txt";
-
+        TxtState state = new TxtState("gameState.txt");
 
         state.save(board,player1, player2);
 
-        StateDTO loaded = state.load(filename);
+        StateDTO loaded = state.load();
 
         assertEquals(stateDTD.player1Name, loaded.player1Name);
         assertEquals(stateDTD.player2Name, loaded.player2Name);
