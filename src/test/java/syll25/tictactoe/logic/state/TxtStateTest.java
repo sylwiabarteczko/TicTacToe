@@ -1,27 +1,39 @@
 package syll25.tictactoe.logic.state;
 
 import org.junit.jupiter.api.Test;
+import syll25.tictactoe.logic.Board;
+import syll25.tictactoe.logic.Player;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class TxtStateTest {
 
-   @Test
-   public void testSaveAndLoad() {
-       StateDTO stateDTO = new StateDTO("Sylwia", "Ania", 'X', 'S',null,3);
-       TxtState state = new TxtState();
-       String filename = "GameState";
+    @Test
+    public void testSaveAndLoad()  throws IOException {
 
-       state.save(filename, stateDTO);
+        Player player1 = new Player("John", 'X');
+        Player player2 = new Player("Adam", 'O');
+        int size = 3;
+        Board board = new Board(size);
 
-       StateDTO loaded = state.load(filename);
+        StateDTO stateDTD = new StateDTO("John", "X", "Adam", "O", null, size);
 
-       assertEquals(stateDTO.player1Name, loaded.player1Name);
-       assertEquals(stateDTO.player2Name, loaded.player2Name);
-       assertEquals(stateDTO.player1Sign, loaded.player1Sign);
-       assertEquals(stateDTO.player2Sign, loaded.player2Sign);
-       assertEquals(stateDTO.size, loaded.size);
+        TxtState state = new TxtState();
+        String filename = "GameState.txt";
 
-   }
+
+        state.save(board,player1, player2);
+
+        StateDTO loaded = state.load(filename);
+
+        assertEquals(stateDTD.player1Name, loaded.player1Name);
+        assertEquals(stateDTD.player2Name, loaded.player2Name);
+        assertEquals(stateDTD.player1Sign, loaded.player1Sign);
+        assertEquals(stateDTD.player2Sign, loaded.player2Sign);
+        assertEquals(stateDTD.size, loaded.size);
+
+    }
 
 }
