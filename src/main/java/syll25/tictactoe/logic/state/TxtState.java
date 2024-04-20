@@ -25,13 +25,9 @@ public class TxtState implements State {
             consoleWriter.println("Saving game state to the file");
 
             PrintWriter out = new PrintWriter(new FileWriter(filename));
-            out.write(player1.getName());
-            out.write(PLAYER_DATA_SEPARATOR);
-            out.write(player1.getSymbol());
+            savePlayerData(player1, out);
             out.write(PLAYERS_SEPARATOR);
-            out.write(player2.getName());
-            out.write(PLAYER_DATA_SEPARATOR);
-            out.write(player2.getSymbol());
+            savePlayerData(player2, out);
             out.println(board.getSize());
             out.close();
 
@@ -40,7 +36,13 @@ public class TxtState implements State {
         }
     }
 
-    @Override
+    private static void savePlayerData(Player player, PrintWriter out) {
+        out.write(player.getName());
+        out.write(PLAYER_DATA_SEPARATOR);
+        out.write(player.getSymbol());
+    }
+
+  @Override
     public StateDTO load() {  //DTO Data Transfer Object
 
         StateDTO stateDTO = new StateDTO("John","X","Adam", "O", null, 3 );
