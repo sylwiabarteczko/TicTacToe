@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public interface GameBoard {
 
+    String getCell(int row, int col);
+
     int getSize();
 
     Optional<Player> getFieldState(int row, int col);

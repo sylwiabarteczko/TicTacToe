@@ -4,12 +4,12 @@ import syll25.tictactoe.logic.GameBoard;
 import syll25.tictactoe.logic.Player;
 
 import java.io.*;
+import java.util.Optional;
 
 public class TxtState implements State {
 
     private static final String PLAYER_DATA_SEPARATOR = ":";
     private static final String PLAYERS_SEPARATOR = ";";
-
     private final String filename;
 
     public TxtState(String filename) {
@@ -20,15 +20,26 @@ public class TxtState implements State {
     public void save(GameBoard board, Player player1, Player player2) {
 
         try {
-            PrintStream consoleWriter = System.out;
-
-            consoleWriter.println("Saving game state to the file");
 
             PrintWriter out = new PrintWriter(new FileWriter(filename));
             savePlayerData(player1, out);
-            out.write(PLAYERS_SEPARATOR);
+            out.print(PLAYERS_SEPARATOR);
             savePlayerData(player2, out);
-            out.println(board.getSize());
+            out.println();
+
+            StringBuilder boardState = new StringBuilder();
+            for (int i = 0; i < board.getSize(); i++) {
+                for (int j = 0; j < board.getSize(); j++) {
+                    Optional<Player> player = board.getFieldState(i, j);
+                    if (player.isPresent()) {
+                        boardState.append(player.get().getSymbol());
+                    } else {
+                        boardState.append("-");
+                    }
+                }
+            }
+
+            out.print(boardState.toString());
             out.close();
 
         } catch (IOException e) {
@@ -37,15 +48,15 @@ public class TxtState implements State {
     }
 
     private static void savePlayerData(Player player, PrintWriter out) {
-        out.write(player.getName());
-        out.write(PLAYER_DATA_SEPARATOR);
-        out.write(player.getSymbol());
+        out.print(player.getName());
+        out.print(PLAYER_DATA_SEPARATOR);
+        out.print(player.getSymbol());
     }
 
-  @Override
+    @Override
     public StateDTO load() {  //DTO Data Transfer Object
 
-        StateDTO stateDTO = new StateDTO("John","X","Adam", "O", null, 3 );
+        StateDTO stateDTO = new StateDTO("John", "X", "Adam", "0", null, 3);
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
@@ -59,16 +70,14 @@ public class TxtState implements State {
             stateDTO.player2Name = player2Data[0];
             stateDTO.player2Sign = player2Data[1];
 
-            String line2 = reader.readLine();
-            int size = (int) Math.sqrt(line2.length());
-            stateDTO.size = Integer.parseInt(line2);
+            String line = reader.readLine();
+            int size = (int) Math.sqrt(line.length());
+            stateDTO.size = size;
 
             String[][] board = new String[size][size];
             for (int i = 0; i < size; i++) {
                 for (int j = 0; j < size; j++) {
-                    char character = line2.charAt(i * size + j);
-                    if (character != '-')
-                        board[i][j] = String.valueOf(character);
+                    board[i][j] = String.valueOf(line.charAt(i * size + j));
                 }
             }
             stateDTO.board = board;

@@ -3,31 +3,42 @@ package syll25.tictactoe.logic;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
 import syll25.tictactoe.logic.exception.OutOfRangeException;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 public class Board implements GameBoard {
-    private final Player[] cells;
+    private final Player[][] cells;
     private final int size;
 
     public Board(int size) {
         this.size = size;
-        this.cells = new Player[size * size];
+        this.cells = new Player[size][size];
         initializeBoard();
     }
 
     public Player[][] getCells() {
         Player[][] cellMatrix = new Player[size][size];
         for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                cellMatrix[i][j] = cells[i * size + j];
-            }
+            System.arraycopy(cells[i], 0, cellMatrix[i], 0, size);
         }
         return cellMatrix;
     }
 
+    @Override
+    public String getCell(int row, int col) {
+        checkValidMove(row,col);
+        Player player = cells[row][col];
+        if (player == null) {
+            return "-";
+        } else {
+            return String.valueOf(player.getSymbol());
+        }
+    }
     private void initializeBoard() {
-        Arrays.fill(cells, null);
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                cells[i][j] = null;
+            }
+        }
     }
 
     public int getSize() {
@@ -36,15 +47,16 @@ public class Board implements GameBoard {
 
     @Override
     public Optional<Player> getFieldState(int row, int col) {
-        int index = row * size + col;
-        return Optional.ofNullable(cells[index]);
+        return Optional.ofNullable(cells[row][col]);
     }
 
     @Override
     public boolean isFull() {
-        for (Player cell : cells) {
-            if (cell == null) {
-                return false;
+        for (Player[] row : cells) {
+            for (Player col : row) {
+                if (col == null) {
+                    return false;
+                }
             }
         }
         return true;
@@ -52,12 +64,11 @@ public class Board implements GameBoard {
 
     @Override
     public void placeSymbol(Player player, int row, int col) {
-        int index = row * size + col;
         checkValidMove(row, col);
-        if (cells[index] != null) {
+        if (cells[row][col] != null) {
             throw new CellOccupiedException();
         }
-        cells[index] = player;
+        cells[row][col] = player;
     }
 
     private void checkValidMove(int row, int col) {
@@ -91,14 +102,13 @@ public class Board implements GameBoard {
         for (int i = 0; i < size; i++) {
             boolean win = true;
             for (int j = 0; j < size; j++) {
-                int index = i * size + j;
-                if (cells[index] == null || cells[index].getSymbol() != symbol) {
+                if (cells[i][j] == null || cells[i][j].getSymbol() != symbol) {
                     win = false;
                     break;
                 }
             }
             if (win) {
-                return Optional.of(cells[i * size]);
+                return Optional.of(cells[i][0]);
             }
         }
         return Optional.empty();
@@ -108,14 +118,13 @@ public class Board implements GameBoard {
         for (int j = 0; j < size; j++) {
             boolean win = true;
             for (int i = 0; i < size; i++) {
-                int index = i * size + j;
-                if (cells[index] == null || cells[index].getSymbol() != symbol) {
+                if (cells[i][j] == null || cells[i][j].getSymbol() != symbol) {
                     win = false;
                     break;
                 }
             }
             if (win) {
-                return Optional.of(cells[j]);
+                return Optional.of(cells[0][j]);
             }
         }
         return Optional.empty();
@@ -126,20 +135,18 @@ public class Board implements GameBoard {
         boolean diagonal2Win = true;
 
         for (int i = 0; i < size; i++) {
-            int index1 = i * size + i;
-            if (cells[index1] == null || cells[index1].getSymbol() != symbol) {
+            if (cells[i][i] == null || cells[i][i].getSymbol() != symbol) {
                 diagonal1Win = false;
             }
-            int index2 = i * size + (size - 1 - i);
-            if (cells[index2] == null || cells[index2].getSymbol() != symbol) {
+            if (cells[i][size - 1 - i] == null || cells[i][size - 1 - i].getSymbol() != symbol) {
                 diagonal2Win = false;
             }
         }
         if (diagonal1Win) {
-            return Optional.of(cells[0]);
+            return Optional.of(cells[0][0]);
         }
         if (diagonal2Win) {
-            return Optional.of(cells[size - 1]);
+            return Optional.of(cells[0][size - 1]);
         }
         return Optional.empty();
     }

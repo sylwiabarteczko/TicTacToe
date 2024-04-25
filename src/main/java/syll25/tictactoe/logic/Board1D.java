@@ -22,6 +22,11 @@ public class Board1D implements GameBoard {
     }
 
     @Override
+    public String getCell(int row, int col) {
+        return null;
+    }
+
+    @Override
     public int getSize() {
         return size;
     }
