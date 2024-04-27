@@ -8,10 +8,12 @@ import java.util.Optional;
 public class Board implements GameBoard {
     private final Player[][] cells;
     private final int size;
+    private final Player[][] board;
 
     public Board(int size) {
         this.size = size;
         this.cells = new Player[size][size];
+        this.board = new Player[size][size];
         initializeBoard();
     }
 
@@ -37,6 +39,21 @@ public class Board implements GameBoard {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 cells[i][j] = null;
+            }
+        }
+    }
+    @Override
+    public void initializeFromState(String[][] boardState, Player player1, Player player2) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                String symbol = boardState[i][j];
+                if (symbol.equals(player1.getSymbol())) {
+                    board[i][j] = player1;
+                } else if (symbol.equals(player2.getSymbol())) {
+                    board[i][j] = player2;
+                } else {
+                    board[i][j] = null;
+                }
             }
         }
     }

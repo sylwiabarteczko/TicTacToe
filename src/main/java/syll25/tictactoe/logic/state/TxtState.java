@@ -56,7 +56,7 @@ public class TxtState implements State {
     @Override
     public StateDTO load() {  //DTO Data Transfer Object
 
-        StateDTO stateDTO = new StateDTO("John", "X", "Adam", "0", null, 3);
+        StateDTO stateDTO = new StateDTO();
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));

@@ -1,0 +1,2 @@
+John:X;Adam:O
+-XX--O-O-
