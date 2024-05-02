@@ -7,6 +7,9 @@ import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.logic.state.TxtState;
 import syll25.tictactoe.ui.BoardRenderer;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -16,7 +19,7 @@ public class Main {
     private static Player player1;
     private static Player player2;
 
-    public static void main(String[] args) {
+    public static void main (String[] args) {
 
         if (args.length == 0) {
             System.out.println("Usage: java Main <gameState.txt>");
@@ -24,32 +27,42 @@ public class Main {
         }
 
         String filename = args[0];
+        Path path = Paths.get(filename);
+
+        if(!Files.exists(path)) {
+            System.out.println("File can not be founded");
+            return;
+        }
+
         State state = new TxtState(filename);
         StateDTO stateDTO = state.load();
 
         if (stateDTO != null) {
-
-            String player1Name = stateDTO.player1Name;
-            String player2Name = stateDTO.player2Name;
-            String player1Sign = stateDTO.player1Sign;
-            String player2Sign = stateDTO.player2Sign;
-
-            Player player1 = new Player(player1Name, player1Sign.charAt(0));
-            Player player2 = new Player(player2Name, player2Sign.charAt(0));
-
-            GameBoard board = new Board(stateDTO.size);
-            board.initializeFromState(stateDTO.board, player1, player2);
-
-            System.out.println("Loaded game board: ");
-            BoardRenderer.renderBoard(board);
-
-            playGame(state, board, player1, player2);
+            loadExistingGames(state, stateDTO);
         } else {
             System.out.println("No saved game state found. Starting a new game.");
             startNewGame(filename);
         }
     }
 
+    public static void loadExistingGames(State state, StateDTO stateDTO) {
+
+        String player1Name = stateDTO.player1Name;
+        String player2Name = stateDTO.player2Name;
+        String player1Sign = stateDTO.player1Sign;
+        String player2Sign = stateDTO.player2Sign;
+
+        Player player1 = new Player(player1Name, player1Sign.charAt(0));
+        Player player2 = new Player(player2Name, player2Sign.charAt(0));
+
+        GameBoard board = new Board(stateDTO.size);
+        board.initializeFromState(stateDTO.board, player1, player2);
+
+        System.out.println("Loaded game board: ");
+        BoardRenderer.renderBoard(board);
+
+        playGame(state, board, player1, player2);
+    }
 
     public static void startNewGame(String filename) {
 
@@ -94,6 +107,7 @@ public class Main {
     }
 }
 
+
 public static boolean playerMove(State state, GameBoard board, Scanner scanner, Player player) {
     int row, col;
     String input;
@@ -130,7 +144,7 @@ public static boolean playerMove(State state, GameBoard board, Scanner scanner, 
 
     BoardRenderer.renderBoard(board);
 
-    state.save(board, player1, player2);
+    state.save(board, Main.player1, Main.player2); // odnoszenie sie do zmiennych statycznych klasy main?
 
     Optional<Player> winner = board.isWinner(player.getSymbol());
     if (winner.isPresent()) {
