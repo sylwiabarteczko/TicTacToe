@@ -7,6 +7,7 @@ import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.logic.state.TxtState;
 import syll25.tictactoe.ui.BoardRenderer;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,30 +19,48 @@ public class Main {
     private static int boardSize = 3;
     private static Player player1;
     private static Player player2;
+    private static final String saveDirectory = System.getProperty("user.home") + "/tictactoe/";
+    ;
 
-    public static void main (String[] args) {
+    public static void main(String[] args) {
+        ensureSaveDirectory();
+
+        String filename = saveDirectory + "gameState.txt";
 
         if (args.length == 0) {
-            System.out.println("Usage: java Main <gameState.txt>");
-            return;
-        }
-
-        String filename = args[0];
-        Path path = Paths.get(filename);
-
-        if(!Files.exists(path)) {
-            System.out.println("File can not be founded");
-            return;
-        }
-
-        State state = new TxtState(filename);
-        StateDTO stateDTO = state.load();
-
-        if (stateDTO != null) {
-            loadExistingGames(state, stateDTO);
-        } else {
-            System.out.println("No saved game state found. Starting a new game.");
+            System.out.println("Using default file: " + filename + "New game begins. ");
             startNewGame(filename);
+        } else {
+            filename = saveDirectory + args[0];
+            Path path = Paths.get(filename);
+            if (!Files.exists(path)) {
+                System.out.println("File can not be founded. New game begins: " + filename);
+                startNewGame(filename);
+            } else {
+                System.out.println("Loaded existing game: " + filename);
+                State state = new TxtState(filename);
+                try {
+                    StateDTO stateDTO = state.load();
+                    loadExistingGames(state, stateDTO);
+                } catch (RuntimeException e) {
+                    System.out.println("No saved game state found. Starting a new game.");
+                    startNewGame(filename);
+                }
+            }
+        }
+
+    }
+
+    private static void ensureSaveDirectory() {
+        try {
+            Path path = Paths.get(saveDirectory);
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+                System.out.println("Created directory: " + path.toString());
+            }
+        } catch (IOException e) {
+            System.out.println("Can not create save directory: " + e.getMessage());
+            System.exit(1);
         }
     }
 
@@ -56,7 +75,16 @@ public class Main {
         Player player2 = new Player(player2Name, player2Sign.charAt(0));
 
         GameBoard board = new Board(stateDTO.size);
-        board.initializeFromState(stateDTO.board, player1, player2);
+        for (int row = 0; row < stateDTO.board.length; row++) {
+            for (int col = 0; col < stateDTO.board[row].length; col++) {
+                if (player1.getSymbol() == stateDTO.board[row][col].charAt(0)) {
+                    board.placeSymbol(player1, row, col);
+                }
+                if (player2.getSymbol() == stateDTO.board[row][col].charAt(0)) {
+                    board.placeSymbol(player2, row, col);
+                }
+            }
+        }
 
         System.out.println("Loaded game board: ");
         BoardRenderer.renderBoard(board);
@@ -105,58 +133,56 @@ public class Main {
         }
 
     }
-}
 
+    public static boolean playerMove(State state, GameBoard board, Scanner scanner, Player player) {
+        int row, col;
+        String input;
 
-public static boolean playerMove(State state, GameBoard board, Scanner scanner, Player player) {
-    int row, col;
-    String input;
+        do {
+            input = scanner.nextLine().toUpperCase();
+            Coordinates coordinates = new Coordinates(input);
 
-    do {
-        input = scanner.nextLine().toUpperCase();
-        Coordinates coordinates = new Coordinates(input);
+            row = coordinates.getRow();
+            col = coordinates.getCol();
 
-        row = coordinates.getRow();
-        col = coordinates.getCol();
+            if (row == -1 || col == -1) {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2, etc.");
+                continue;
+            }
 
-        if (row == -1 || col == -1) {
-            System.out.println("Invalid input. Please enter row and column in the format A1, B2, etc.");
-            continue;
+            try {
+                board.placeSymbol(player, row, col);
+            } catch (InvalidMoveException ex) {
+                System.out.println(ex.getMessage());
+                continue;
+            } catch (OutOfRangeException ex) {
+                System.out.println("Invalid move: Out of range. ");
+                continue;
+            } catch (CellOccupiedException ex) {
+                System.out.println("Invalid move: Cell already occupied. ");
+                continue;
+            } catch (InvalidCoordinatesException ex) {
+                System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
+                continue;
+            }
+            break;
+        } while (true);
+
+        BoardRenderer.renderBoard(board);
+
+        state.save(board, player1, player2);
+
+        Optional<Player> winner = board.isWinner(player.getSymbol());
+        if (winner.isPresent()) {
+            System.out.println(player.getName() + player.getSymbol() + " wins!");
+            return true;
+        } else if (board.isFull()) {
+            System.out.println("We have a draw!");
+            return true;
         }
-
-        try {
-            board.placeSymbol(player, row, col);
-        } catch (InvalidMoveException ex) {
-            System.out.println(ex.getMessage());
-            continue;
-        } catch (OutOfRangeException ex) {
-            System.out.println("Invalid move: Out of range. ");
-            continue;
-        } catch (CellOccupiedException ex) {
-            System.out.println("Invalid move: Cell already occupied. ");
-            continue;
-        } catch (InvalidCoordinatesException ex) {
-            System.out.println("Invalid input. Please enter row and column in the format A1, B2 etc. ");
-            continue;
-        }
-        break;
-    } while (true);
-
-    BoardRenderer.renderBoard(board);
-
-    state.save(board, Main.player1, Main.player2); // odnoszenie sie do zmiennych statycznych klasy main?
-
-    Optional<Player> winner = board.isWinner(player.getSymbol());
-    if (winner.isPresent()) {
-        System.out.println(player.getName() + player.getSymbol() + " wins!");
-        return true;
-    } else if (board.isFull()) {
-        System.out.println("We have a draw!");
-        return true;
+        return false;
     }
-    return false;
 }
-
 
 
 

@@ -8,4 +8,5 @@ public class StateDTO {
     public String[][] board;
     public int size;
 
-}
+} //TODO zapoznac sie i przerobic na record. W StateDTO dwa obiekty klasy PlayerDTO (obiekt Player1 i Player2)
+// TODO size - metoda ktora bedzie wyliczac rozmiar na podstawie board
