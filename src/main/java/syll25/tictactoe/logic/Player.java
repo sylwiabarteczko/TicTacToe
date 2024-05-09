@@ -17,6 +17,10 @@ public class Player {
         return name;
     }
 
+    public PlayerDTO playerDTO() {
+        return new PlayerDTO();
+    }
+
     @Override
     public String toString() {
         return String.valueOf(symbol);

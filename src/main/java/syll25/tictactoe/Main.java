@@ -41,7 +41,7 @@ public class Main {
                 State state = new TxtState(filename);
                 try {
                     StateDTO stateDTO = state.load();
-                    loadExistingGames(state, stateDTO);
+                    loadSavedGames(state, stateDTO);
                 } catch (RuntimeException e) {
                     System.out.println("No saved game state found. Starting a new game.");
                     startNewGame(filename);
@@ -64,7 +64,7 @@ public class Main {
         }
     }
 
-    public static void loadExistingGames(State state, StateDTO stateDTO) {
+    public static void loadSavedGames(State state, StateDTO stateDTO) {
 
         String player1Name = stateDTO.player1Name;
         String player2Name = stateDTO.player2Name;
