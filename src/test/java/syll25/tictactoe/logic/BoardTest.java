@@ -2,7 +2,6 @@ package syll25.tictactoe.logic;
 
 import org.junit.jupiter.api.Test;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
-import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.logic.exception.OutOfRangeException;
 
 import java.util.Optional;

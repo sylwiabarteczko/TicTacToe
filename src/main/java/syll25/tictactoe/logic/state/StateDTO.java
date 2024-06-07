@@ -1,12 +1,18 @@
 package syll25.tictactoe.logic.state;
 
+import syll25.tictactoe.logic.Player;
+
 public class StateDTO {
-    public String player1Name;
-    public String player2Name;
-    public String player1Sign;
-    public String player2Sign;
+
+    public PlayerDTO player1;
+    public PlayerDTO player2;
     public String[][] board;
     public int size;
 
-} //TODO zapoznac sie i przerobic na record. W StateDTO dwa obiekty klasy PlayerDTO (obiekt Player1 i Player2)
-// TODO size - metoda ktora bedzie wyliczac rozmiar na podstawie board
+    public StateDTO(Player player1, Player player2, Player[][] cells, int size) {
+    }
+
+    public StateDTO() {
+
+    }
+}

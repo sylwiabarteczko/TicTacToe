@@ -4,7 +4,7 @@ import syll25.tictactoe.logic.*;
 import syll25.tictactoe.logic.exception.*;
 import syll25.tictactoe.logic.state.State;
 import syll25.tictactoe.logic.state.StateDTO;
-import syll25.tictactoe.logic.state.TxtState;
+import syll25.tictactoe.logic.state.StateFactory;
 import syll25.tictactoe.ui.BoardRenderer;
 
 import java.io.IOException;
@@ -14,41 +14,36 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Scanner;
 
+
 public class Main {
 
+    private static final String saveDirectory = System.getProperty("user.home") + "/tictactoe/";
     private static int boardSize = 3;
     private static Player player1;
     private static Player player2;
-    private static final String saveDirectory = System.getProperty("user.home") + "/tictactoe/";
-    ;
 
     public static void main(String[] args) {
         ensureSaveDirectory();
 
-        String filename = saveDirectory + "gameState.txt";
-
         if (args.length == 0) {
-            System.out.println("Using default file: " + filename + "New game begins. ");
-            startNewGame(filename);
-        } else {
-            filename = saveDirectory + args[0];
-            Path path = Paths.get(filename);
-            if (!Files.exists(path)) {
-                System.out.println("File can not be founded. New game begins: " + filename);
-                startNewGame(filename);
-            } else {
-                System.out.println("Loaded existing game: " + filename);
-                State state = new TxtState(filename);
-                try {
-                    StateDTO stateDTO = state.load();
-                    loadSavedGames(state, stateDTO);
-                } catch (RuntimeException e) {
-                    System.out.println("No saved game state found. Starting a new game.");
-                    startNewGame(filename);
-                }
-            }
+            System.out.println("Using default file: New game begins. ");
+            return;
         }
-
+        switch (args[0]) {
+            case "--list-games":
+                listGames();
+                return;
+            case "--load-game":
+                if (args.length < 2) {
+                    System.out.println("Provide filename. ");
+                    return;
+                }
+                loadGame(args[1]);
+                break;
+            default:
+                System.out.println("Unknown command. ");
+                return;
+        }
     }
 
     private static void ensureSaveDirectory() {
@@ -59,20 +54,46 @@ public class Main {
                 System.out.println("Created directory: " + path.toString());
             }
         } catch (IOException e) {
-            System.out.println("Can not create save directory: " + e.getMessage());
+            System.out.println("Can not create save directory. ");
             System.exit(1);
+        }
+    }
+
+    private static void listGames() {
+        try {
+            Files.list(Paths.get(saveDirectory))
+                    .filter(Files::isRegularFile)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .forEach(System.out::println);
+        } catch (IOException e) {
+            System.out.println("Failed to list games. ");
+        }
+    }
+
+    public static void loadGame(String filename) {
+        Path path = Paths.get(saveDirectory + filename);
+        State state = StateFactory.getState(filename);
+
+        if (!Files.exists(path)) {
+            System.out.println("File not found. Starting a new game: " + filename);
+            startNewGame(filename);
+        } else {
+            System.out.println("Loaded existing game: " + filename);
+            try {
+                StateDTO stateDTO = state.load();
+                loadSavedGames(state, stateDTO);
+            } catch (RuntimeException e) {
+                System.out.println("No saved game state found. Starting a new game.");
+                startNewGame(filename);
+            }
         }
     }
 
     public static void loadSavedGames(State state, StateDTO stateDTO) {
 
-        String player1Name = stateDTO.player1Name;
-        String player2Name = stateDTO.player2Name;
-        String player1Sign = stateDTO.player1Sign;
-        String player2Sign = stateDTO.player2Sign;
-
-        Player player1 = new Player(player1Name, player1Sign.charAt(0));
-        Player player2 = new Player(player2Name, player2Sign.charAt(0));
+        Player player1 = new Player(stateDTO.player1.name(), stateDTO.player1.sign().charAt(0));
+        Player player2 = new Player(stateDTO.player2.name(), stateDTO.player2.sign().charAt(0));
 
         GameBoard board = new Board(stateDTO.size);
         for (int row = 0; row < stateDTO.board.length; row++) {
@@ -114,7 +135,7 @@ public class Main {
             System.out.println("Player " + player1.getName() + " that is your symbol: " + player1.getSymbol());
             System.out.println("Player " + player2.getName() + " that is your symbol: " + player2.getSymbol());
 
-            playGame(new TxtState((filename)), board, player1, player2);
+            playGame(StateFactory.getState(filename), board, player1, player2);
 
         } catch (NoMoreSymbolsException ex) {
             System.out.println("No more symbols available. ");

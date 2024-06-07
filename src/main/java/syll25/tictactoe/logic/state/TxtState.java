@@ -58,6 +58,7 @@ public class TxtState implements State {
 
         StateDTO stateDTO = new StateDTO();
 
+
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
             String line1 = reader.readLine();
@@ -65,10 +66,11 @@ public class TxtState implements State {
             String[] player1Data = players[0].split(PLAYER_DATA_SEPARATOR);
             String[] player2Data = players[1].split(PLAYER_DATA_SEPARATOR);
 
-            stateDTO.player1Name = player1Data[0];
-            stateDTO.player1Sign = player1Data[1];
-            stateDTO.player2Name = player2Data[0];
-            stateDTO.player2Sign = player2Data[1];
+            PlayerDTO player1DTO = new PlayerDTO(player1Data[0], player1Data[1]);
+            PlayerDTO player2DTO = new PlayerDTO(player2Data[0], player2Data[1]);
+
+            stateDTO.player1 = player1DTO;
+            stateDTO.player2 = player2DTO;
 
             String line = reader.readLine();
             int size = (int) Math.sqrt(line.length());
