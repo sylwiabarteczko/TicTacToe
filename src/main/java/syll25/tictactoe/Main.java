@@ -2,6 +2,7 @@ package syll25.tictactoe;
 
 import syll25.tictactoe.logic.*;
 import syll25.tictactoe.logic.exception.*;
+import syll25.tictactoe.logic.state.SqliteState;
 import syll25.tictactoe.logic.state.State;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.logic.state.StateFactory;
@@ -21,12 +22,19 @@ public class Main {
     private static int boardSize = 3;
     private static Player player1;
     private static Player player2;
+    private static SqliteState sqliteState;
 
     public static void main(String[] args) {
         ensureSaveDirectory();
 
+        SqliteState sqliteState = new SqliteState();
+
+        State state;
+
         if (args.length == 0) {
             System.out.println("Using default file: New game begins. ");
+            state = StateFactory.getState("sqlite");
+            startNewGame(state.toString());
             return;
         }
         switch (args[0]) {
@@ -190,6 +198,8 @@ public class Main {
         } while (true);
 
         BoardRenderer.renderBoard(board);
+
+        sqliteState.save(board,player1,player2);
 
         state.save(board, player1, player2);
 
