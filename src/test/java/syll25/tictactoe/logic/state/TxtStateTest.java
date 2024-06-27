@@ -28,10 +28,10 @@ class TxtStateTest {
         state.save(board, player1, player2);
         StateDTO loaded = state.load();
 
-        assertEquals("John", loaded.player1Name);
-        assertEquals("X", loaded.player1Sign);
-        assertEquals("Adam", loaded.player2Name);
-        assertEquals("O", loaded.player2Sign);
+        assertEquals("John", loaded.player1.name());
+        assertEquals("X", loaded.player1.sign());
+        assertEquals("Adam", loaded.player2.name());
+        assertEquals("O", loaded.player2.sign());
         assertEquals(size, loaded.size);
 
         String[][] expectedBoard = {
@@ -61,10 +61,10 @@ class TxtStateTest {
         state.save(board, player1, player2);
         StateDTO loaded = state.load();
 
-        assertEquals("John", loaded.player1Name);
-        assertEquals("X", loaded.player1Sign);
-        assertEquals("Adam", loaded.player2Name);
-        assertEquals("O", loaded.player2Sign);
+        assertEquals("John", loaded.player1.name());
+        assertEquals("X", loaded.player1.sign());
+        assertEquals("Adam", loaded.player2.name());
+        assertEquals("O", loaded.player2.sign());
         assertEquals(size, loaded.size);
 
         String[][] expectedBoard = {
@@ -97,10 +97,10 @@ class TxtStateTest {
         state.save(board, player1, player2);
         StateDTO loaded = state.load();
 
-        assertEquals("John", loaded.player1Name);
-        assertEquals("X", loaded.player1Sign);
-        assertEquals("Adam", loaded.player2Name);
-        assertEquals("O", loaded.player2Sign);
+        assertEquals("John", loaded.player1.name());
+        assertEquals("X", loaded.player1.sign());
+        assertEquals("Adam", loaded.player2.name());
+        assertEquals("O", loaded.player2.sign());
         assertEquals(size, loaded.size);
 
         String[][] expectedBoard = {

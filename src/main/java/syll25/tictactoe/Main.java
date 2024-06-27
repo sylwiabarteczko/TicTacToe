@@ -27,8 +27,6 @@ public class Main {
     public static void main(String[] args) {
         ensureSaveDirectory();
 
-        SqliteState sqliteState = new SqliteState();
-
         State state;
 
         if (args.length == 0) {
@@ -198,8 +196,6 @@ public class Main {
         } while (true);
 
         BoardRenderer.renderBoard(board);
-
-        sqliteState.save(board,player1,player2);
 
         state.save(board, player1, player2);
 

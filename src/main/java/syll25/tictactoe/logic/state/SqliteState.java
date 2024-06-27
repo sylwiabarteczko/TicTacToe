@@ -8,10 +8,15 @@ import java.util.Optional;
 
 public class SqliteState implements State {
 
-    private static final String DataBase_URL = "jdbc:sqlite:\" + System.getProperty(\"user.home\") + \"/tictactoe/game_state.db\";\n"; // tego nie jestem pewna
+    private static final String DataBase_URL = "jdbc:sqlite:" + System.getProperty("user.home") + "/tictactoe/game_state.db";
+
+    public SqliteState() {
+        createTable();
+    }
 
     @Override
     public void save(GameBoard board, Player player1, Player player2) {
+
 
         try (Connection connection = DriverManager.getConnection(DataBase_URL);
              PreparedStatement stmt = connection.prepareStatement(
@@ -82,7 +87,7 @@ public class SqliteState implements State {
                     "player2_name TEXT NOT NULL, " +
                     "player2_symbol TEXT NOT NULL, " +
                     "board TEXT NOT NULL, " +
-                    "size INTEGER NOT NULL);";    // to wszystko nie jestem pewna czy sciagnelam dla SQL
+                    "size INTEGER NOT NULL);";
 
             stmt.executeUpdate(createTableSQL);
             System.out.println("Table created or already exists.");
