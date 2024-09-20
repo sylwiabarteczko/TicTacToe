@@ -1,6 +1,7 @@
 package syll25.tictactoe;
 
 import syll25.tictactoe.logic.*;
+import syll25.tictactoe.logic.exception.*;
 import syll25.tictactoe.logic.state.SqliteState;
 import syll25.tictactoe.logic.state.State;
 import syll25.tictactoe.logic.state.StateDTO;
