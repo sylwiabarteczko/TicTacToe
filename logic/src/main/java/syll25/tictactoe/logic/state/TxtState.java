@@ -21,7 +21,7 @@ public class TxtState implements State {
 
         try {
 
-            PrintWriter out = new PrintWriter(new FileWriter(filename)); // to miejsce !!
+            PrintWriter out = new PrintWriter(new FileWriter(filename));
             savePlayerData(player1, out);
             out.print(PLAYERS_SEPARATOR);
             savePlayerData(player2, out);
