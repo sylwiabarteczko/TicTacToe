@@ -27,11 +27,6 @@ public class Board1D implements GameBoard {
     }
 
     @Override
-    public void initializeFromState(String[][] boardState, Player player1, Player player2) {
-        
-    }
-
-    @Override
     public int getSize() {
         return size;
     }

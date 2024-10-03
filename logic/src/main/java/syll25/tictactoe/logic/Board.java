@@ -33,6 +33,9 @@ public class Board implements GameBoard {
             return String.valueOf(player.getSymbol());
         }
     }
+    public boolean isCellEmpty(int row, int col) {
+        return cells[row][col] == null;
+    }
     private void initializeBoard() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -40,15 +43,6 @@ public class Board implements GameBoard {
             }
         }
     }
-    @Override
-    public void initializeFromState(String[][] boardState, Player player1, Player player2) {
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                String symbol = boardState[i][j];
-                cells[i][j] = null;
-            }
-        }
-    }  // TODO pozbyc sie i uzyc placeSymbol
 
     public int getSize() {
         return size;

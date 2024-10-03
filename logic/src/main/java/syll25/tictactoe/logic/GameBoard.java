@@ -8,8 +8,6 @@ public interface GameBoard {
 
     String getCell(int row, int col);
 
-    void initializeFromState(String[][] boardState, Player player1, Player player2);
-
     int getSize();
 
     Optional<Player> getFieldState(int row, int col);

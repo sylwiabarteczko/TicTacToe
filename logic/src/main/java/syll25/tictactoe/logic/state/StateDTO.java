@@ -8,6 +8,7 @@ public class StateDTO {
     public PlayerDTO player2;
     public String[][] board;
     public int size;
+    public String currentPlayer;
 
     public StateDTO(Player player1, Player player2, Player[][] cells, int size) {
     }
