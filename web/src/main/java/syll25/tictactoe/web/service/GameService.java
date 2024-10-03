@@ -22,23 +22,23 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
-    private Board board;
     private Player player1;
     private Player player2;
     private Player currentPlayer;
     private boolean gameOver = false;
-    private static final String saveDirectory = System.getProperty("user.home") + "/tictactoe/";
+    private static final String saveDirectory = System.getProperty("user.home") + "/tictactoe/"; // po co nam to?
 
-    public Board startNewGame() {
-        this.board = new Board(3);
+    public Board startNewGame() { // a zapis do bazy?
+        this.board = new Board(3); // jaki scope?
         this.player1 = new Player("Player 1", 'X');
         this.player2 = new Player("Player 2", 'O');
         this.currentPlayer = player1;
         this.gameOver = false;
-        return board;
+        return board; // + id
     }
 
-    public Board makeMove(int row, int col) {
+    public Board makeMove(int row, int col) { // + id
+        // TODO load game state from db - based on id
         if (!board.isCellEmpty(row, col)) {
             throw new IllegalArgumentException("Cell is already occupied");
         }
@@ -56,6 +56,7 @@ public class GameService {
         } catch (InvalidMoveException ex) {
             throw new CellOccupiedException();
         }
+        // TODO save game state
         return board;
     }
     public Board loadGame(String filename) {

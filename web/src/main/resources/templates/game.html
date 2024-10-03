@@ -2,11 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tic Tac Toe</title>
+    <!-- css -->
 </head>
 <body>
 <h1>Tic Tac Toe Game</h1>
 <div>
+
     <form th:action="@{/playerMove}" method="post">
+<!--        TODO id gry-->
         <table>
             <tr th:each="row : ${#numbers.sequence(0, board.size - 1)}">
                 <td th:each="col : ${#numbers.sequence(0, board.size - 1)}">

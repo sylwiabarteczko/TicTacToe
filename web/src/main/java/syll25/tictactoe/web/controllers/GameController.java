@@ -28,13 +28,13 @@ public class GameController {
     }
 
     @PostMapping("/playerMove")
-    public String playerMove(@RequestParam int row, @RequestParam int col, Model model) {
-        Board board = gameService.makeMove(row, col);
+    public String playerMove(@RequestParam int row, @RequestParam int col, /*TODO long gameId, */Model model) {
+        Board board = gameService.makeMove(row, col); // TODO id
         model.addAttribute("board", board);
         return "game";
     }
         @PostMapping("/load")
-        public String loadGame(@RequestParam String filename, Model model) {
+        public String loadGame(@RequestParam String filename, Model model) { // mamy bazę wiec po co nam pliki? co będzie identyfikatorem zamiast filename?
             Board board = gameService.loadGame(filename);
             model.addAttribute("board", board);
             return "game";

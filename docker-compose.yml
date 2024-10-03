@@ -2,10 +2,14 @@ version: '3.1'
 
 # docker run --rm --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
 
+# https://hub.docker.com/_/postgres
+
 services:
   db:
-    image: tictactoe
+    image: postgres # czym jest obraz?
     environment:
+      POSTGRES_DB: tic-tac-toe
+      POSTGRES_USER: tic-tac-toe
       POSTGRES_PASSWORD: mysecretpassword
     ports:
       - "5435:5432"

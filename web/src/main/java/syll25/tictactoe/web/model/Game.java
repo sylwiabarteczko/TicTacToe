@@ -1,11 +1,9 @@
 package syll25.tictactoe.web.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
+//import org.springframework.data.annotation.Id;
 
+@Table(name = "game_states")
 @Entity
 public class Game {
 
