@@ -15,15 +15,17 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
-    private Board board;
-    private Player player1;
-    private Player player2;
-    private Player currentPlayer;
-    private boolean gameOver = false;
+
+    //TODO tego być nie powinno. ale czy szkodzi? dlaczego?
+//    private Board board;
+//    private Player player1;
+//    private Player player2;
+//    private Player currentPlayer;
+//    private boolean gameOver = false;
 
     public Game startNewGame() {
-        this.board = new Board(3);
-        this.player1 = new Player("Player 1", 'X');
+        Board board = new Board(3);
+        Player player1 = new Player("Player 1", 'X');
         this.player2 = new Player("Player 2", 'O');
         this.currentPlayer = player1;
         this.gameOver = false;
@@ -34,10 +36,10 @@ public class GameService {
 
     public Game makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Game not found")); // TODO własny wyjątek (z logic) + obsługa błędów w spring
 
-        board = loadBoardFromString(game.getBoardState());
-        currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
+        Board board = loadBoardFromString(game.getBoardState());
+        Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         if (!board.isCellEmpty(row, col)) {
             throw new IllegalArgumentException("Cell is already occupied");
@@ -63,6 +65,7 @@ public class GameService {
             throw new CellOccupiedException();
         }
     }
+
     public Game loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
