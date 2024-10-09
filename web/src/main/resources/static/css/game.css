@@ -1,0 +1,56 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+h1 {
+    color: #ff4081;
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.game-board {
+    display: inline-block;
+    margin: 20px auto;
+}
+
+table {
+    border-spacing: 10px;
+    margin: 0 auto;
+}
+
+th {
+    font-size: 24px;
+    color: #ff4081;
+}
+
+td, th {
+    padding: 10px;
+    border: 2px solid #ff4081;
+}
+
+button {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    color: #ff4081;
+    background-color: #fff;
+    border: 2px solid #ff4081;
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    background-color: #eee;
+}
+
+button:hover:not(:disabled) {
+    background-color: #ff4081;
+    color: white;
+    transform: scale(1.05);
+}

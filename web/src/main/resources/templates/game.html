@@ -2,23 +2,45 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tic Tac Toe</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/game.css">
 </head>
 <body>
-<h1>Tic Tac Toe Game</h1>
-<div>
+<h1>Tic Tac Toe</h1>
+<div class="game-board">
     <form th:action="@{/playerMove}" method="post">
+        <input type="hidden" th:name="gameId" th:value="${game.id}"/>
         <table>
-            <tr th:each="row : ${#numbers.sequence(0, board.size - 1)}">
-                <td th:each="col : ${#numbers.sequence(0, board.size - 1)}">
-                    <button type="submit" th:name="'rowcol-' + row + '-' + col"
-                            th:value="${board.getCell(row, col)}"
-                            th:disabled="${board.getCell(row, col) != '-'}">
-                        <span th:text="${board.getCell(row, col)}"></span>
-                    </button>
-                </td>
+            <thead>
+            <tr>
+                <th></th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
             </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th>1</th>
+                <td><button type="submit" th:name="rowcol-0-0">-</button></td>
+                <td><button type="submit" th:name="rowcol-0-1">-</button></td>
+                <td><button type="submit" th:name="rowcol-0-2">-</button></td>
+            </tr>
+            <tr>
+                <th>2</th>
+                <td><button type="submit" th:name="rowcol-1-0">-</button></td>
+                <td><button type="submit" th:name="rowcol-1-1">-</button></td>
+                <td><button type="submit" th:name="rowcol-1-2">-</button></td>
+            </tr>
+            <tr>
+                <th>3</th>
+                <td><button type="submit" th:name="rowcol-2-0">-</button></td>
+                <td><button type="submit" th:name="rowcol-2-1">-</button></td>
+                <td><button type="submit" th:name="rowcol-2-2">-</button></td>
+            </tr>
+            </tbody>
         </table>
     </form>
 </div>
 </body>
 </html>
+

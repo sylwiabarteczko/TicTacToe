@@ -1,48 +1,85 @@
 package syll25.tictactoe.web.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
 
     @Column(name = "board_state", columnDefinition = "TEXT")
-    private final String boardState;
+    private String boardState;
 
     @Column(name = "player1_name")
-    private final String player1Name;
+    private String player1Name;
 
     @Column(name = "player2_name")
-    private final String player2Name;
+    private String player2Name;
 
     @Column(name = "current_player")
-    private final String currentPlayer;
+    private String currentPlayer;
 
     @Column(name = "game_over")
-    private final boolean gameOver;
+    private boolean gameOver;
 
     protected Game() {
-        this.id = null;
-        this.boardState = null;
-        this.player1Name = null;
-        this.player2Name = null;
-        this.currentPlayer = null;
-        this.gameOver = false;
     }
 
     public Game(String boardState, String player1Name, String player2Name, String currentPlayer, boolean gameOver) {
-        this.id = null;
         this.boardState = boardState;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         this.currentPlayer = currentPlayer;
         this.gameOver = gameOver;
     }
+    public Long getId() {
+        return id;
+    }
+
+    public String getBoardState() {
+        return boardState;
+    }
+
+    public void setBoardState(String boardState) {
+        this.boardState = boardState;
+    }
+
+    public String getPlayer1Name() {
+        return player1Name;
+    }
+
+    public String getPlayer2Name() {
+        return player2Name;
+    }
+
+    public String getCurrentPlayer() {
+        return currentPlayer;
+    }
+    public void setCurrentPlayer(String currentPlayer) {
+        this.currentPlayer = currentPlayer;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    @Override
+    public String toString() {
+        return "Game{" +
+                "id=" + id +
+                ", boardState='" + boardState + '\'' +
+                ", player1Name='" + player1Name + '\'' +
+                ", player2Name='" + player2Name + '\'' +
+                ", currentPlayer='" + currentPlayer + '\'' +
+                ", gameOver=" + gameOver +
+                '}';
+
+    }
+
 }

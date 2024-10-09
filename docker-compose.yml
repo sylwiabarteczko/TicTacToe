@@ -3,9 +3,10 @@ version: '3.1'
 # docker run --rm --name some-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 postgres
 
 services:
-  db:
-    image: tictactoe
+  tictactoe:
+    image: postgres
     environment:
       POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_USER: tic-tac-toe
     ports:
-      - "5435:5432"
+      - "5434:5432"
