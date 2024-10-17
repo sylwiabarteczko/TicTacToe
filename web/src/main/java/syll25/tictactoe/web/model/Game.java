@@ -2,6 +2,7 @@ package syll25.tictactoe.web.model;
 
 import jakarta.persistence.*;
 
+@Table(name = "game_states")
 @Entity
 public class Game {
 
@@ -24,7 +25,7 @@ public class Game {
     @Column(name = "game_over")
     private boolean gameOver;
 
-    protected Game() {
+    public Game() {
     }
 
     public Game(String boardState, String player1Name, String player2Name, String currentPlayer, boolean gameOver) {

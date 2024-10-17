@@ -3,8 +3,10 @@ package syll25.tictactoe.web.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import syll25.tictactoe.logic.Board;
+import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
+import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.repository.GameRepository;
 
@@ -16,19 +18,13 @@ public class GameService {
     @Autowired
     private GameRepository gameRepository;
 
-    //TODO tego być nie powinno. ale czy szkodzi? dlaczego?
-//    private Board board;
-//    private Player player1;
-//    private Player player2;
-//    private Player currentPlayer;
-//    private boolean gameOver = false;
-
-    public Game startNewGame() {
-        Board board = new Board(3);
-        Player player1 = new Player("Player 1", 'X');
-        this.player2 = new Player("Player 2", 'O');
-        this.currentPlayer = player1;
-        this.gameOver = false;
+    public Game startNewGame(String player1Name, String player2Name, int boardSize) {
+        Board board = new Board(boardSize);
+        CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
+        Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
+        Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
+        Player currentPlayer = player1;
+        boolean gameOver = false;
 
         Game game = new Game(board.toString(), player1.getName(), player2.getName(), currentPlayer.getName(), gameOver);
         return gameRepository.save(game);
@@ -36,9 +32,11 @@ public class GameService {
 
     public Game makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game not found")); // TODO własny wyjątek (z logic) + obsługa błędów w spring
+                .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
 
         Board board = loadBoardFromString(game.getBoardState());
+        Player player1 = new Player("Player 1", 'X');
+        Player player2 = new Player("Player 2", 'O');
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         if (!board.isCellEmpty(row, col)) {
@@ -65,13 +63,14 @@ public class GameService {
             throw new CellOccupiedException();
         }
     }
-
     public Game loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        board = loadBoardFromString(game.getBoardState());
-        currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
+        Board board = loadBoardFromString(game.getBoardState());
+        Player player1 = new Player("Player 1", 'X');
+        Player player2 = new Player("Player 2", 'O');
+        Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         return game;
     }
@@ -82,6 +81,8 @@ public class GameService {
 
     private Board loadBoardFromString(String boardState) {
         Board board = new Board(3);
+        Player player1 = new Player("Player 1", 'X');
+        Player player2 = new Player("Player 2", 'O');
         String[] rows = boardState.split("\n");
         for (int row = 0; row < 3; row++) {
             String[] cells = rows[row].split(" ");

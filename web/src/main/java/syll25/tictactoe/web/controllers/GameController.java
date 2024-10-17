@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.service.GameService;
 
@@ -19,20 +20,41 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @GetMapping("/start")
-    public String startNewGame(Model model) {
-        Game game = gameService.startNewGame();
+    @GetMapping("/new")
+    public String newGameForm(Model model) {
+        model.addAttribute("game", new Game());
+        return "newGame";
+    }
+    @PostMapping("/start")
+    public String startNewGame(@RequestParam String player1Name,
+                               @RequestParam String player2Name,
+                               @RequestParam int boardSize,
+                               Model model) {
+        Game game = gameService.startNewGame(player1Name, player2Name, boardSize);
         model.addAttribute("board", game.getBoardState());
         model.addAttribute("game", game);
         return "game";
     }
-
-    @PostMapping("/playerMove")
-    public String playerMove(@RequestParam Long gameId, @RequestParam int row, @RequestParam int col, Model model) {
-        Game game = gameService.makeMove(gameId, row, col);
-        model.addAttribute("board", game.getBoardState());
-        model.addAttribute("game", game);
-        return "game";
+    @GetMapping("/{gameId}")
+    public ModelAndView viewGame(@PathVariable Long gameId) {
+        Game game = gameService.loadGame(gameId);
+        ModelAndView modelAndView = new ModelAndView("game");
+        modelAndView.addObject("game", game);
+        return modelAndView;
+    }
+    @PostMapping("/move")
+    public ModelAndView makeMove(
+            @RequestParam("gameId") Long gameId,
+            @RequestParam("row") int row,
+            @RequestParam("col") int col) {
+        try {
+            Game game = gameService.makeMove(gameId, row, col);
+            return new ModelAndView("redirect:/game/" + game.getId());
+        } catch (IllegalArgumentException e) {
+            ModelAndView modelAndView = new ModelAndView("error");
+            modelAndView.addObject("message", e.getMessage());
+            return modelAndView;
+        }
     }
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {
