@@ -7,6 +7,8 @@
 <body>
 <h1>Tic Tac Toe</h1>
 
+
+<!-- TODO SRP (nawet w SPA robi się to inaczej) -->
 <div th:if="${game == null}">
     <form th:action="@{/game/start}" method="post">
         <label for="player1Name">Player 1 Name:</label>
@@ -31,14 +33,17 @@
                 <thead>
                 <tr>
                     <th></th>
+<!--                    na pewno mamy w obiekcie tej klasy pole boardSize?-->
                     <th th:each="colIndex : ${#numbers.sequence(0, game.boardSize - 1)}"
                         th:text="${(char)('A' + colIndex)}"></th>
                 </tr>
                 </thead>
                 <tbody>
+<!--                TODO operujmy na obiekcie typu Board z logic -->
                 <tr th:each="row, rowIndex : ${#strings.arraySplit(game.boardState, '\n')}">
                     <th th:text="${rowIndex + 1}"></th>
                     <td th:each="cell, colIndex : ${#strings.arraySplit(row, ' ')}">
+    <!--                        TODO nie można mieć dwóch różnych name i value-->
                         <button type="submit"
                                 name="row" th:value="${rowIndex}"
                                 name="col" th:value="${colIndex}"

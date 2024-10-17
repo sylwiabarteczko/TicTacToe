@@ -26,8 +26,10 @@ public class GameService {
         Player currentPlayer = player1;
         boolean gameOver = false;
 
+        // TODO na pewno toString?
         Game game = new Game(board.toString(), player1.getName(), player2.getName(), currentPlayer.getName(), gameOver);
-        return gameRepository.save(game);
+        return gameRepository.save(game); // TODO zwracajmy DTO - nie wystawiajmy struktury bazy danych na świat (i będziemy mogli operować na Board z logic)
+        // TODO w pozostałych metodach analogicznie
     }
 
     public Game makeMove(Long gameId, int row, int col) {
@@ -35,7 +37,7 @@ public class GameService {
                 .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
 
         Board board = loadBoardFromString(game.getBoardState());
-        Player player1 = new Player("Player 1", 'X');
+        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą?
         Player player2 = new Player("Player 2", 'O');
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
@@ -58,6 +60,7 @@ public class GameService {
             game.setCurrentPlayer(currentPlayer.getName());
 
             return gameRepository.save(game);
+            //return board; // TODO
 
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
@@ -68,7 +71,7 @@ public class GameService {
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
         Board board = loadBoardFromString(game.getBoardState());
-        Player player1 = new Player("Player 1", 'X');
+        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą? (i powielamy kod?)
         Player player2 = new Player("Player 2", 'O');
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
@@ -81,7 +84,7 @@ public class GameService {
 
     private Board loadBoardFromString(String boardState) {
         Board board = new Board(3);
-        Player player1 = new Player("Player 1", 'X');
+        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą? (i powielamy kod?)
         Player player2 = new Player("Player 2", 'O');
         String[] rows = boardState.split("\n");
         for (int row = 0; row < 3; row++) {

@@ -25,6 +25,7 @@ public class Game {
     @Column(name = "game_over")
     private boolean gameOver;
 
+    // TODO potrzebujemy tego?
     public Game() {
     }
 
