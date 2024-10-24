@@ -27,9 +27,13 @@ public class GameService {
         Player currentPlayer = player1;
         boolean gameOver = false;
 //TODO nie chcemy toString
+        // TODO zostało
+        // TODO analogicznie do JsonState
+        // 1. przy pomocy mappera skonwertować StateDTO na jsona
+        // 2. do Game (do boardState w Game) przekazać jsona
         Game game = new Game(board.toString(), player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
         gameRepository.save(game);
-        return board;
+        return board; // TODO zwrócić state dto
     }
 
     public Board makeMove(Long gameId, int row, int col) {
@@ -60,7 +64,7 @@ public class GameService {
             game.setCurrentPlayer(currentPlayer.getName());
             gameRepository.save(game);
 
-            return board;
+            return board; // TODO zwrócić state dto
 
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
@@ -84,7 +88,7 @@ public class GameService {
 
     private Board loadBoardFromString(String boardState, char player1Symbol, char player2Symbol) {
         Board board = new Board(3);
-        Player player1 = new Player("Player 1", player1Symbol);
+        Player player1 = new Player("Player 1", player1Symbol); // TODO zahardkodowane nazwy graczy
         Player player2 = new Player("Player 2", player2Symbol);
         String[] rows = boardState.split("\n");
         for (int row = 0; row < 3; row++) {

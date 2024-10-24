@@ -26,10 +26,10 @@ public class Game {
     private boolean gameOver;
 
     @Column
-    private char player1Symbol;
+    private char player1Symbol; // TODO nie ma tego w boardState?
 
     @Column
-    private char player2Symbol;
+    private char player2Symbol; // TODO nie ma tego w boardState?
 
     public Game(String boardState, String player1Name, char player1Symbol, String player2Name, char player2Symbol, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;

@@ -6,7 +6,8 @@
 </head>
 <body>
 <h1>Tic Tac Toe</h1>
-
+<!--tu dostajemy zmienną board (nie game, jak niżej napisane)-->
+<!--board jest typu StateDto-->
 <div>
     <p>Current Player: <span th:text="${game.currentPlayer}"></span></p>
     <div class="game-board">
@@ -16,11 +17,14 @@
                 <thead>
                 <tr>
                     <th></th>
+<!--                <th th:each="colIndex : ${#numbers.sequence(0, board.board.length - 1)}"   LUB: -->
+<!--                <th th:each="colIndex : ${#numbers.sequence(0, board.size - 1)}"    -->
                     <th th:each="colIndex : ${#numbers.sequence(0, game.boardState[0].length - 1)}"
                         th:text="${(char)('A' + colIndex)}"></th>
                 </tr>
                 </thead>
                 <tbody>
+<!--                j/w -->
                 <tr th:each="row, rowIndex : ${#numbers.sequence(0, game.boardState.length - 1)}">
                     <th th:text="${rowIndex + 1}"></th>
                     <td th:each="cell, colIndex : ${game.boardState[rowIndex]}">

@@ -31,7 +31,7 @@ public class GameController {
                                @RequestParam int boardSize,
                                Model model) {
         Board board = gameService.startNewGame(player1Name, player2Name, boardSize);
-        model.addAttribute("board", board.toString());
+        model.addAttribute("board", board.toString()); // TODO co mamy w stringu? potrzebujemy state dto
         return "game";
     }
     @GetMapping("/{gameId}")
@@ -49,7 +49,7 @@ public class GameController {
 
         Board board = gameService.makeMove(gameId, row, col);
         ModelAndView modelAndView = new ModelAndView("game");
-        modelAndView.addObject("board", board.toString());
+        modelAndView.addObject("board", board.toString()); // TODO co mamy w stringu? potrzebujemy state dto
         return modelAndView;
     }
     @PostMapping("/load")
