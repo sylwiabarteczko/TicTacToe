@@ -22,23 +22,18 @@ public class GameController {
     }
 
     @GetMapping("/new")
-    public String newGameForm(Model model) {
-        model.addAttribute("game", new Game()); // TODO widok oczekuje nulla?
-        return "newGame"; // TODO nie mamy takiego szablonu
+    public String newGameForm() {
+        return "newGame";
     }
-
     @PostMapping("/start")
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
                                @RequestParam int boardSize,
                                Model model) {
-        Board game = gameService.startNewGame(player1Name, player2Name, boardSize);
-        model.addAttribute("board", game.getBoardState());
-        model.addAttribute("game", game);
-        // TODO nie chcemy tu redirecta jak w makeMove?
+        Board board = gameService.startNewGame(player1Name, player2Name, boardSize);
+        model.addAttribute("board", board.toString());
         return "game";
     }
-
     @GetMapping("/{gameId}")
     public ModelAndView viewGame(@PathVariable Long gameId) {
         Game game = gameService.loadGame(gameId);
@@ -46,20 +41,16 @@ public class GameController {
         modelAndView.addObject("game", game);
         return modelAndView;
     }
-
     @PostMapping("/move")
     public ModelAndView makeMove(
-      @RequestParam("gameId") Long gameId,
-      @RequestParam("row") int row,
-      @RequestParam("col") int col) {
-        try {
-            Game game = gameService.makeMove(gameId, row, col);
-            return new ModelAndView("redirect:/game/" + game.getId());
-        } catch (IllegalArgumentException e) {
-            ModelAndView modelAndView = new ModelAndView("error");
-            modelAndView.addObject("message", e.getMessage());
-            return modelAndView;
-        }
+            @RequestParam("gameId") Long gameId,
+            @RequestParam("row") int row,
+            @RequestParam("col") int col) {
+
+        Board board = gameService.makeMove(gameId, row, col);
+        ModelAndView modelAndView = new ModelAndView("game");
+        modelAndView.addObject("board", board.toString());
+        return modelAndView;
     }
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {

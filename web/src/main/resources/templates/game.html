@@ -7,24 +7,7 @@
 <body>
 <h1>Tic Tac Toe</h1>
 
-
-<!-- TODO SRP (nawet w SPA robi się to inaczej) -->
-<div th:if="${game == null}">
-    <form th:action="@{/game/start}" method="post">
-        <label for="player1Name">Player 1 Name:</label>
-        <input type="text" id="player1Name" name="player1Name" required>
-
-        <label for="player2Name">Player 2 Name:</label>
-        <input type="text" id="player2Name" name="player2Name" required>
-
-        <label for="boardSize">Board Size:</label>
-        <input type="number" id="boardSize" name="boardSize" min="3" max="10" value="3" required>
-
-        <button type="submit">Start Game</button>
-    </form>
-</div>
-
-<div th:if="${game != null}">
+<div>
     <p>Current Player: <span th:text="${game.currentPlayer}"></span></p>
     <div class="game-board">
         <form th:action="@{/game/move}" method="post">
@@ -33,20 +16,16 @@
                 <thead>
                 <tr>
                     <th></th>
-<!--                    na pewno mamy w obiekcie tej klasy pole boardSize?-->
-                    <th th:each="colIndex : ${#numbers.sequence(0, game.boardSize - 1)}"
+                    <th th:each="colIndex : ${#numbers.sequence(0, game.boardState[0].length - 1)}"
                         th:text="${(char)('A' + colIndex)}"></th>
                 </tr>
                 </thead>
                 <tbody>
-<!--                TODO operujmy na obiekcie typu Board z logic -->
-                <tr th:each="row, rowIndex : ${#strings.arraySplit(game.boardState, '\n')}">
+                <tr th:each="row, rowIndex : ${#numbers.sequence(0, game.boardState.length - 1)}">
                     <th th:text="${rowIndex + 1}"></th>
-                    <td th:each="cell, colIndex : ${#strings.arraySplit(row, ' ')}">
-    <!--                        TODO nie można mieć dwóch różnych name i value-->
+                    <td th:each="cell, colIndex : ${game.boardState[rowIndex]}">
                         <button type="submit"
-                                name="row" th:value="${rowIndex}"
-                                name="col" th:value="${colIndex}"
+                                name="cell" th:value="${rowIndex}_${colIndex}"
                                 th:disabled="${game.gameOver || cell != '-'}"
                                 th:text="${cell}">-</button>
                     </td>

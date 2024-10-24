@@ -18,27 +18,27 @@ public class GameService {
     @Autowired
     private GameRepository gameRepository;
 
-    public Game startNewGame(String player1Name, String player2Name, int boardSize) {
+    public Board startNewGame(String player1Name, String player2Name, int boardSize) {
         Board board = new Board(boardSize);
+
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
         Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
         Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
         Player currentPlayer = player1;
         boolean gameOver = false;
-
-        // TODO na pewno toString?
-        Game game = new Game(board.toString(), player1.getName(), player2.getName(), currentPlayer.getName(), gameOver);
-        return gameRepository.save(game); // TODO zwracajmy DTO - nie wystawiajmy struktury bazy danych na świat (i będziemy mogli operować na Board z logic)
-        // TODO w pozostałych metodach analogicznie
+//TODO nie chcemy toString
+        Game game = new Game(board.toString(), player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
+        gameRepository.save(game);
+        return board;
     }
 
-    public Game makeMove(Long gameId, int row, int col) {
+    public Board makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
 
-        Board board = loadBoardFromString(game.getBoardState());
-        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą?
-        Player player2 = new Player("Player 2", 'O');
+        Board board = loadBoardFromString(game.getBoardState(), game.getPlayer1Symbol(), game.getPlayer2Symbol());
+        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
+        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         if (!board.isCellEmpty(row, col)) {
@@ -58,9 +58,9 @@ public class GameService {
 
             game.setBoardState(board.toString());
             game.setCurrentPlayer(currentPlayer.getName());
+            gameRepository.save(game);
 
-            return gameRepository.save(game);
-            //return board; // TODO
+            return board;
 
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
@@ -70,9 +70,9 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        Board board = loadBoardFromString(game.getBoardState());
-        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą? (i powielamy kod?)
-        Player player2 = new Player("Player 2", 'O');
+        Board board = loadBoardFromString(game.getBoardState(), game.getPlayer1Symbol(), game.getPlayer2Symbol());
+        Player player1 = new Player("Player 1", game.getPlayer1Symbol());
+        Player player2 = new Player("Player 2", game.getPlayer2Symbol());
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         return game;
@@ -82,10 +82,10 @@ public class GameService {
         return gameRepository.findAll();
     }
 
-    private Board loadBoardFromString(String boardState) {
+    private Board loadBoardFromString(String boardState, char player1Symbol, char player2Symbol) {
         Board board = new Board(3);
-        Player player1 = new Player("Player 1", 'X'); // TODO dlaczego robimy nowych graczy z inną nazwą? (i powielamy kod?)
-        Player player2 = new Player("Player 2", 'O');
+        Player player1 = new Player("Player 1", player1Symbol);
+        Player player2 = new Player("Player 2", player2Symbol);
         String[] rows = boardState.split("\n");
         for (int row = 0; row < 3; row++) {
             String[] cells = rows[row].split(" ");

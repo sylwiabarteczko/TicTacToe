@@ -25,14 +25,18 @@ public class Game {
     @Column(name = "game_over")
     private boolean gameOver;
 
-    // TODO potrzebujemy tego?
-    public Game() {
-    }
+    @Column
+    private char player1Symbol;
 
-    public Game(String boardState, String player1Name, String player2Name, String currentPlayer, boolean gameOver) {
+    @Column
+    private char player2Symbol;
+
+    public Game(String boardState, String player1Name, char player1Symbol, String player2Name, char player2Symbol, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;
         this.player1Name = player1Name;
+        this.player1Symbol = player1Symbol;
         this.player2Name = player2Name;
+        this.player2Symbol = player2Symbol;
         this.currentPlayer = currentPlayer;
         this.gameOver = gameOver;
     }
@@ -69,6 +73,14 @@ public class Game {
 
     public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
+    }
+
+    public char getPlayer1Symbol() {
+        return player1Symbol;
+    }
+
+    public char getPlayer2Symbol() {
+        return player2Symbol;
     }
 
     @Override
