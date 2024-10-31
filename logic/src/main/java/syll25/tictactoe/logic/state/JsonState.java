@@ -18,14 +18,18 @@ public class JsonState implements State{
 
     @Override
     public void save(GameBoard board, Player player1, Player player2) {
-        StateDTO stateDTO = new StateDTO(player1, player2, board.getCells(), board.getSize());
+        String currentPlayer = player1.getName();
+        boolean gameOver = false;
+
+        StateDTO stateDTO = new StateDTO(player1, player2, board.getCells(), board.getSize(), currentPlayer, gameOver);
+
         try {
             mapper.writeValue(new File(filename), stateDTO);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save game state", e);
         }
-
     }
+
 
     @Override
     public StateDTO load() {

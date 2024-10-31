@@ -1,5 +1,7 @@
 package syll25.tictactoe.web.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import syll25.tictactoe.logic.Board;
@@ -7,6 +9,7 @@ import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
 import syll25.tictactoe.logic.exception.InvalidMoveException;
+import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.repository.GameRepository;
 
@@ -18,7 +21,17 @@ public class GameService {
     @Autowired
     private GameRepository gameRepository;
 
-    public Board startNewGame(String player1Name, String player2Name, int boardSize) {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private String stateToJson(StateDTO stateDTO) {
+        try {
+            return objectMapper.writeValueAsString(stateDTO);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert StateDTO to JSON", e);
+        }
+    }
+
+    public StateDTO startNewGame(String player1Name, String player2Name, int boardSize) {
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
@@ -26,21 +39,22 @@ public class GameService {
         Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
         Player currentPlayer = player1;
         boolean gameOver = false;
-//TODO nie chcemy toString
-        // TODO zostało
-        // TODO analogicznie do JsonState
-        // 1. przy pomocy mappera skonwertować StateDTO na jsona
-        // 2. do Game (do boardState w Game) przekazać jsona
-        Game game = new Game(board.toString(), player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
+
+        StateDTO stateDTO = new StateDTO(null, player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), gameOver);
+
+
+        String boardStateJson = stateToJson(stateDTO);
+
+        Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
         gameRepository.save(game);
-        return board; // TODO zwrócić state dto
+        return stateDTO;
     }
 
-    public Board makeMove(Long gameId, int row, int col) {
+    public StateDTO makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
 
-        Board board = loadBoardFromString(game.getBoardState(), game.getPlayer1Symbol(), game.getPlayer2Symbol());
+        Board board = loadBoardFromString(gameId);
         Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
         Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
@@ -64,39 +78,52 @@ public class GameService {
             game.setCurrentPlayer(currentPlayer.getName());
             gameRepository.save(game);
 
-            return board; // TODO zwrócić state dto
+            return new StateDTO(game.getId(), player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), game.isGameOver());
 
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
         }
     }
-    public Game loadGame(Long gameId) {
+
+    public Board loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        Board board = loadBoardFromString(game.getBoardState(), game.getPlayer1Symbol(), game.getPlayer2Symbol());
-        Player player1 = new Player("Player 1", game.getPlayer1Symbol());
-        Player player2 = new Player("Player 2", game.getPlayer2Symbol());
+        Board board = loadBoardFromString(gameId);
+
+        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
+        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
+
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
-        return game;
+        return board;
     }
 
     public List<Game> listGames() {
         return gameRepository.findAll();
     }
 
-    private Board loadBoardFromString(String boardState, char player1Symbol, char player2Symbol) {
-        Board board = new Board(3);
-        Player player1 = new Player("Player 1", player1Symbol); // TODO zahardkodowane nazwy graczy
-        Player player2 = new Player("Player 2", player2Symbol);
-        String[] rows = boardState.split("\n");
-        for (int row = 0; row < 3; row++) {
+    private Board loadBoardFromString(Long gameId) {
+
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+
+        char player1Symbol = game.getPlayer1Symbol();
+        char player2Symbol = game.getPlayer2Symbol();
+        String boardState = game.getBoardState();
+
+        Board board = new Board(boardState.split("\n").length);
+
+        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
+        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
+
+        String[] rows = game.getBoardState().split("\n");
+        for (int row = 0; row < rows.length; row++) {
             String[] cells = rows[row].split(" ");
-            for (int col = 0; col < 3; col++) {
-                if (cells[col].equals("X")) {
+            for (int col = 0; col < cells.length; col++) {
+                if (cells[col].equals(String.valueOf(player1.getSymbol()))) {
                     board.placeSymbol(player1, row, col);
-                } else if (cells[col].equals("O")) {
+                } else if (cells[col].equals(String.valueOf(player2.getSymbol()))) {
                     board.placeSymbol(player2, row, col);
                 }
             }

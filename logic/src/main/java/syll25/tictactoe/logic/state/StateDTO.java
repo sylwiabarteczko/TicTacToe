@@ -2,33 +2,24 @@ package syll25.tictactoe.logic.state;
 
 import syll25.tictactoe.logic.Player;
 
-// TODO psujemy CLI
 public class StateDTO {
 
-    private Long gameId; // TODO potrzebujemy tego w logic+cli, czy w web?
     public PlayerDTO player1;
     public PlayerDTO player2;
     public String[][] board;
     public int size;
     public String currentPlayer;
-    public boolean gameOver; // TODO potrzebujemy tego w logic+cli, czy w web?
 
     public StateDTO(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
-        this.gameId = gameId;
-        this.player1 = new PlayerDTO(player1.getName(), player1.getSymbol());
-        this.player2 = new PlayerDTO(player2.getName(), player2.getSymbol());
-        this.board = board;
+        this.player1 = new PlayerDTO(player1.getName(), String.valueOf(player1.getSymbol()));
+        this.player2 = new PlayerDTO(player2.getName(), String.valueOf(player2.getSymbol()));
         this.size = size;
         this.currentPlayer = currentPlayer;
-        this.gameOver = gameOver;
+
     }
 
     public StateDTO(Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
         this(null, player1, player2, board, size, currentPlayer, gameOver);
-    }
-
-    public Long getGameId() {
-        return gameId;
     }
 
     public String[][] getBoard() {
@@ -43,9 +34,6 @@ public class StateDTO {
         return currentPlayer;
     }
 
-    public boolean isGameOver() {
-        return gameOver;
-    }
     public StateDTO() {
 
     }

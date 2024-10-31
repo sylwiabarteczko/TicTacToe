@@ -26,17 +26,13 @@ public class Game {
     private boolean gameOver;
 
     @Column
-    private char player1Symbol; // TODO nie ma tego w boardState?
+    private char player1Symbol;
 
-    @Column
-    private char player2Symbol; // TODO nie ma tego w boardState?
 
     public Game(String boardState, String player1Name, char player1Symbol, String player2Name, char player2Symbol, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;
         this.player1Name = player1Name;
-        this.player1Symbol = player1Symbol;
         this.player2Name = player2Name;
-        this.player2Symbol = player2Symbol;
         this.currentPlayer = currentPlayer;
         this.gameOver = gameOver;
     }
@@ -75,14 +71,6 @@ public class Game {
         this.gameOver = gameOver;
     }
 
-    public char getPlayer1Symbol() {
-        return player1Symbol;
-    }
-
-    public char getPlayer2Symbol() {
-        return player2Symbol;
-    }
-
     @Override
     public String toString() {
         return "Game{" +
@@ -96,4 +84,11 @@ public class Game {
 
     }
 
+    public char getPlayer1Symbol() {
+        return player1Symbol;
+    }
+
+    public char getPlayer2Symbol() {
+        return getPlayer2Symbol();
+    }
 }
