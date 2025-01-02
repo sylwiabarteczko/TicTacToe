@@ -14,6 +14,7 @@ public class BoardRendererTest {
 
         BoardRenderer.renderBoard(board);
 
+        // TODO asercje
     }
 
     @Test
@@ -27,6 +28,8 @@ public class BoardRendererTest {
         board.placeSymbol(player2, 0, 1);
 
         BoardRenderer.renderBoard(board);
+
+        // TODO asercje
     }
 
 }

@@ -22,6 +22,8 @@ public class GameControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.get("/game/new"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("newGame"));
+
+        // TODO czy oprócz właściwego widoku, chcemy sprawdzić także co się w nim zawiera? np. model?
     }
     @Test
     public void startNewGameTest() throws Exception {
@@ -30,7 +32,7 @@ public class GameControllerTest {
                 .param("player2Name", "Sabina")
                 .param("boardSize", "3"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/game/{gameId}"));
+                .andExpect(redirectedUrlPattern("/game/{gameId}")); // bardzo dobrze, że sprawdzamy przekierowanie
     }
     @Test
     public void gameIdTest() throws Exception {
@@ -40,6 +42,8 @@ public class GameControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("game"))
                 .andExpect(model().attributeExists("stateDTO"));
+
+        // TODO czy oprócz właściwego widoku i modelu, chcemy sprawdzić także co się w nim zawiera? w makeMoveTest sprawdzamy wartości...
     }
 
     @Test
@@ -62,7 +66,7 @@ public class GameControllerTest {
                 .param("gameId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("game"));
-
+        // TODO czy oprócz właściwego widoku, chcemy sprawdzić także co się w nim zawiera? j/w
     }
 
 }

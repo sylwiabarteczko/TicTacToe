@@ -87,11 +87,13 @@ public class Game {
 
     }
 
+    // TODO dlaczego adnotacja nagle na metodzie a nie na polu?
     @Column(name = "player1Symbol")
     public char getPlayer1Symbol() {
         return player1Symbol;
     }
 
+    // TODO dlaczego adnotacja nagle na metodzie a nie na polu?
     @Column(name = "player2Symbol")
     public char getPlayer2Symbol() {
         return getPlayer2Symbol();

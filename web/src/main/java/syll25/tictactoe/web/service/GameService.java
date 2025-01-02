@@ -99,6 +99,7 @@ public class GameService {
 
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
+        // zwracamy pusty obiekt?
         return new StateDTO();
     }
 
