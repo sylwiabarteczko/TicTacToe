@@ -32,6 +32,7 @@ public class GameService {
     }
 
     public StateDTO startNewGame(String player1Name, String player2Name, int boardSize) {
+
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
@@ -46,7 +47,9 @@ public class GameService {
         String boardStateJson = stateToJson(stateDTO);
 
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
+
         gameRepository.save(game);
+
         return stateDTO;
     }
 
@@ -85,7 +88,7 @@ public class GameService {
         }
     }
 
-    public Board loadGame(Long gameId) {
+    public StateDTO loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
@@ -96,7 +99,7 @@ public class GameService {
 
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
-        return board;
+        return new StateDTO();
     }
 
     public List<Game> listGames() {

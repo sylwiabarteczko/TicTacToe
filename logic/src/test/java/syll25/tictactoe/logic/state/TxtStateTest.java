@@ -6,6 +6,9 @@ import syll25.tictactoe.logic.Player;
 
 import java.io.IOException;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class TxtStateTest {
 
     private static final String FILE_PATH = "gameState.txt";

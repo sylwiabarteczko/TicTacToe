@@ -19,7 +19,7 @@ public class XmlState implements State{
 
     @Override
     public void save(GameBoard board, Player player1, Player player2) {
-        StateDTO stateDTO = new StateDTO(player1, player2, board.getCells(), board.getSize());
+        StateDTO stateDTO = new StateDTO();
         try {
             JAXBContext context = JAXBContext.newInstance(StateDTO.class);
             Marshaller marshaller = context.createMarshaller();
@@ -39,6 +39,11 @@ public class XmlState implements State{
         } catch (JAXBException e) {
             throw new RuntimeException();
         }
+    }
+
+    @Override
+    public StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
+        return null;
     }
 }
 

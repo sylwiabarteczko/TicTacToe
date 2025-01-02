@@ -21,7 +21,7 @@ public class JsonState implements State{
         String currentPlayer = player1.getName();
         boolean gameOver = false;
 
-        StateDTO stateDTO = new StateDTO(player1, player2, board.getCells(), board.getSize(), currentPlayer, gameOver);
+        StateDTO stateDTO = new StateDTO();
 
         try {
             mapper.writeValue(new File(filename), stateDTO);
@@ -38,5 +38,10 @@ public class JsonState implements State{
         } catch (IOException e) {
             throw new RuntimeException("Failed to load game state", e);
         }
+    }
+
+    @Override
+    public StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
+        return null;
     }
 }

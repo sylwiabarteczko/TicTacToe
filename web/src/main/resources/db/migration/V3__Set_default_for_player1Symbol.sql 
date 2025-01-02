@@ -1,0 +1,1 @@
+ALTER TABLE game ALTER COLUMN player1Symbol SET NOT NULL;

@@ -47,6 +47,12 @@ public class TxtState implements State {
         }
     }
 
+
+    @Override
+    public StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
+        return null;
+    }
+
     private static void savePlayerData(Player player, PrintWriter out) {
         out.print(player.getName());
         out.print(PLAYER_DATA_SEPARATOR);
@@ -57,7 +63,6 @@ public class TxtState implements State {
     public StateDTO load() {  //DTO Data Transfer Object
 
         StateDTO stateDTO = new StateDTO();
-
 
         try {
             BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));

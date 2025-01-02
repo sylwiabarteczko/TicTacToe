@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import syll25.tictactoe.logic.Board;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.service.GameService;
@@ -29,19 +28,19 @@ public class GameController {
     @PostMapping("/start")
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
-                               @RequestParam int boardSize,
-                               Model model) {
-        StateDTO stateDTO = gameService.startNewGame(player1Name, player2Name, boardSize);
-        model.addAttribute("board", stateDTO);
-        return "game";
+                               @RequestParam int boardSize) {
+        gameService.startNewGame(player1Name, player2Name, boardSize);
+        return "redirect:/game/{gameId}";
     }
+
     @GetMapping("/{gameId}")
     public ModelAndView viewGame(@PathVariable Long gameId) {
-        Board board = gameService.loadGame(gameId);
+        StateDTO stateDTO = gameService.loadGame(gameId);
         ModelAndView modelAndView = new ModelAndView("game");
-        modelAndView.addObject("board", board );
+        modelAndView.addObject("stateDTO", stateDTO );
         return modelAndView;
     }
+
     @PostMapping("/move")
     public ModelAndView makeMove(
             @RequestParam("gameId") Long gameId,
@@ -53,11 +52,12 @@ public class GameController {
         modelAndView.addObject("stateDTO", stateDTO);
         return modelAndView;
     }
+
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {
-        Board board = gameService.loadGame(gameId);
+        StateDTO stateDTO = gameService.loadGame(gameId);
 
-        model.addAttribute("board", board);
+        model.addAttribute("board", stateDTO);
         return "game";
     }
 

@@ -22,6 +22,10 @@ public class StateDTO {
         this(null, player1, player2, board, size, currentPlayer, gameOver);
     }
 
+    public StateDTO() {
+
+    }
+
     public String[][] getBoard() {
         return board;
     }
@@ -34,7 +38,7 @@ public class StateDTO {
         return currentPlayer;
     }
 
-    public StateDTO() {
+    public StateDTO(Long gameId, Player player1, Player player2, Player[][] cells, int size, String name, boolean gameOver) {
 
     }
 }

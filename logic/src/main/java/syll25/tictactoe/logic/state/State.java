@@ -8,4 +8,5 @@ public interface State {
 
     StateDTO load();
 
+    StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver);
 }

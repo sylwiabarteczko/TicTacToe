@@ -8,32 +8,43 @@
 <h1>Tic Tac Toe</h1>
 
 <div>
-    <p>Current Player: <span th:text="${board.currentPlayer}"></span></p>
+    <div th:if="${stateDTO.gameOver}">
+        <p th:if="${stateDTO.currentPlayer != null}" th:text="${stateDTO.currentPlayer + ' wins!'}"></p>
+        <p th:if="${stateDTO.currentPlayer == null}">It's a draw!</p>
+        <a th:href="@{/game/new}">Start a new game</a>
+    </div>
+
+
+
+    <div th:if="${!stateDTO.gameOver}">
+    <p>Current Player: <span th:text="${stateDTO.currentPlayer}"></span></p>
     <div class="game-board">
         <form th:action="@{/game/move}" method="post">
-            <input type="hidden" name="gameId" th:value="${board.id}"/>
+            <input type="hidden" name="gameId" th:value="${stateDTO.gameId}"/>
             <table>
                 <thead>
                 <tr>
                     <th></th>
-                    <th th:each="colIndex : ${#numbers.sequence(0, board.board[0].length - 1)}"
+                    <th th:each="colIndex : ${#numbers.sequence(0, stateDTO.board[0].length - 1)}"
                         th:text="${(char)('A' + colIndex)}"></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="row, rowIndex : ${#numbers.sequence(0, board.board.length - 1)}">
+                <tr th:each="row, rowIndex : ${#numbers.sequence(0, stateDTO.board.length - 1)}">
                     <th th:text="${rowIndex + 1}"></th>
-                    <td th:each="cell, colIndex : ${board.board[rowIndex]}">
+                    <td th:each="cell, colIndex : ${stateDTO.board[rowIndex]}">
                         <button type="submit"
-                                name="cell" th:value="${rowIndex}_${colIndex}"
-                                th:disabled="${board.gameOver || cell != '-'}"
-                                th:text="${cell}">-</button>
+                                name="cell"
+                                th:value="${rowIndex + '_' + colIndex}"
+                                th:disabled="${cell != '-'}"
+                                th:text="${cell != '-' ? cell : ''}">-</button>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </form>
     </div>
+</div>
 </div>
 </body>
 </html>
