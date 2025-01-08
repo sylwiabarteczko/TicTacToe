@@ -10,6 +10,7 @@ public class StateDTO {
     public int size;
     public String currentPlayer;
 
+    // TODO staramy się nie zmieniać komponentu logic, zwłaszcza staramy się, aby nie miał on wiedzy o implementacji web - gameId nie powinno się tutaj znajdować
     public StateDTO(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
         this.player1 = new PlayerDTO(player1.getName(), String.valueOf(player1.getSymbol()));
         this.player2 = new PlayerDTO(player2.getName(), String.valueOf(player2.getSymbol()));

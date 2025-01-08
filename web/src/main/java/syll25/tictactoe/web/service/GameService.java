@@ -50,7 +50,7 @@ public class GameService {
 
         gameRepository.save(game);
 
-        return stateDTO;
+        return stateDTO; // TODO zrób osobne DTO - StateDTO nie powinien mieć wiedzy o gameId
     }
 
     public StateDTO makeMove(Long gameId, int row, int col) {
