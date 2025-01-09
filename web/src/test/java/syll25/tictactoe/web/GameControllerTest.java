@@ -36,14 +36,18 @@ public class GameControllerTest {
     public void gameIdTest() throws Exception {
 
         Long gameId = 1L;
-        mockMvc.perform(MockMvcRequestBuilders.get("/game/{gameId}"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/game/{gameId}", gameId))
                 .andExpect(status().isOk())
                 .andExpect(view().name("game"))
+                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("gameId", Matchers.is(gameId))))
+                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("gameOver", Matchers.is(false))))
+                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("size", Matchers.greaterThanOrEqualTo(3))))
                 .andExpect(model().attributeExists("stateDTO"));
     }
 
     @Test
     public void makeMoveTest() throws Exception {
+
         mockMvc.perform(MockMvcRequestBuilders.post("/game/move")
                         .param("gameId", "1")
                         .param("row", "0")
@@ -51,7 +55,8 @@ public class GameControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("game"))
                 .andExpect(model().attributeExists("stateDTO"))
-                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("gameOver", Matchers.is(false))));
+                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("gameOver", Matchers.is(false))))
+                .andExpect(model().attribute("stateDTO", Matchers.hasProperty("size", Matchers.greaterThanOrEqualTo(3))));
     }
 
     @Test
@@ -61,13 +66,10 @@ public class GameControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/game/load")
                 .param("gameId", "1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("game"));
+                .andExpect(view().name("game"))
+                .andExpect(model().attributeExists("board"))
+                .andExpect(model().attribute("board", Matchers.hasProperty("gameId", Matchers.is(gameId))));
 
     }
 
 }
-
-
-
-
-

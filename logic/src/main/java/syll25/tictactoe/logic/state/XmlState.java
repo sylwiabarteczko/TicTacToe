@@ -41,9 +41,5 @@ public class XmlState implements State{
         }
     }
 
-    @Override
-    public StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
-        return null;
-    }
 }
 

@@ -26,18 +26,23 @@ public class Game {
     private boolean gameOver;
 
     @Column
-    private char player1Symbol;
+    private Character player1Symbol;
+
+    @Column
+    private Character player2Symbol;
 
     public Game() {
 
     }
 
-    public Game(String boardState, String player1Name, char player1Symbol, String player2Name, char player2Symbol, String currentPlayer, boolean gameOver) {
+    public Game(String boardState, String player1Name, Character player1Symbol, String player2Name, Character player2Symbol, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
         this.currentPlayer = currentPlayer;
         this.gameOver = gameOver;
+        this.player1Symbol = player1Symbol;
+        this.player2Symbol = player2Symbol;
     }
     public Long getId() {
         return id;
@@ -87,13 +92,13 @@ public class Game {
 
     }
 
-    @Column(name = "player1Symbol")
-    public char getPlayer1Symbol() {
+
+    public Character getPlayer1Symbol() {
         return player1Symbol;
     }
 
-    @Column(name = "player2Symbol")
-    public char getPlayer2Symbol() {
-        return getPlayer2Symbol();
+
+    public Character getPlayer2Symbol() {
+        return player2Symbol;
     }
 }
