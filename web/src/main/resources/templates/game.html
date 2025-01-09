@@ -24,7 +24,7 @@
                     <tr>
                         <th></th>
                         <th th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}"
-                            th:text="${'A' + colIndex}"></th>
+                            th:text="${#gameViewService.getColumnIndex(colIndex)}"></th>
                     </tr>
                     </thead>
                     <tbody>

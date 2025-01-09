@@ -16,4 +16,8 @@ public class GameViewService {
         }
     }
 
+    public char getColumnIndex(int colIndex) {
+        return (char) ('A' + colIndex);
+    }
+
 }
