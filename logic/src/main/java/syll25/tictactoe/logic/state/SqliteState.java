@@ -76,10 +76,6 @@ public class SqliteState implements State {
         return stateDTO;
     }
 
-    @Override
-    public StateDTO load(Long gameId, Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
-        return null;
-    }
 
     private void createTable() {
         try (Connection connection = DriverManager.getConnection(DataBase_URL);

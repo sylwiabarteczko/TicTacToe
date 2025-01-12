@@ -9,42 +9,41 @@
 
 <div>
     <div th:if="${stateDTO.gameOver}">
-        <p th:if="${stateDTO.currentPlayer != null}" th:text="${stateDTO.currentPlayer + ' wins!'}"></p>
-        <p th:if="${stateDTO.currentPlayer == null}">It's a draw!</p>
+        <p th:if="${stateDTO.winnerFound}" th:text="${stateDTO.currentPlayer + ' wins!'}"></p>
+        <p th:if="${!stateDTO.winnerFound}">It's a draw!</p>
         <a th:href="@{/game/new}">Start a new game</a>
     </div>
 
-
-
     <div th:if="${!stateDTO.gameOver}">
-    <p>Current Player: <span th:text="${stateDTO.currentPlayer}"></span></p>
-    <div class="game-board">
-        <form th:action="@{/game/move}" method="post">
-            <input type="hidden" name="gameId" th:value="${stateDTO.gameId}"/>
-            <table>
-                <thead>
-                <tr>
-                    <th></th>
-                    <th th:each="colIndex : ${#numbers.sequence(0, stateDTO.board[0].length - 1)}"
-                        th:text="${(char)('A' + colIndex)}"></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="row, rowIndex : ${#numbers.sequence(0, stateDTO.board.length - 1)}">
-                    <th th:text="${rowIndex + 1}"></th>
-                    <td th:each="cell, colIndex : ${stateDTO.board[rowIndex]}">
-                        <button type="submit"
-                                name="cell"
-                                th:value="${rowIndex + '_' + colIndex}"
-                                th:disabled="${cell != '-'}"
-                                th:text="${cell != '-' ? cell : ''}">-</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
+        <p>Current Player: <span th:text="${stateDTO.currentPlayer}"></span></p>
+        <div class="game-board">
+            <form th:action="@{/game/move}" method="post">
+                <input type="hidden" name="gameId" th:value="${stateDTO.gameId}"/>
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        <th th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}"
+                            th:text="${'A' + colIndex}"></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="rowIndex : ${#numbers.sequence(0, stateDTO.size - 1)}">
+                        <th th:text="${rowIndex + 1}"></th>
+                        <td th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}">
+                            <button type="submit"
+                                    name="cell"
+                                    th:value="${rowIndex + '_' + colIndex}"
+                                    th:disabled="${stateDTO.board[rowIndex][colIndex] != null}"
+                                    th:text="${stateDTO.board[rowIndex][colIndex] != null ? stateDTO.board[rowIndex][colIndex] : ''}">
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
     </div>
-</div>
 </div>
 </body>
 </html>

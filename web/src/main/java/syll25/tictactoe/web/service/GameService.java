@@ -31,7 +31,7 @@ public class GameService {
         }
     }
 
-    public StateDTO startNewGame(String player1Name, String player2Name, int boardSize) {
+    public Long startNewGame(String player1Name, String player2Name, int boardSize) {
 
         Board board = new Board(boardSize);
 
@@ -50,12 +50,12 @@ public class GameService {
 
         gameRepository.save(game);
 
-        return stateDTO; // TODO zrób osobne DTO - StateDTO nie powinien mieć wiedzy o gameId
+        return game.getId();
     }
 
     public StateDTO makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
         Board board = loadBoardFromString(gameId);
         Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
@@ -66,23 +66,32 @@ public class GameService {
             throw new IllegalArgumentException("Cell is already occupied");
         }
 
+        boolean winnerFound = false;
+        boolean draw = false;
+
         try {
             board.placeSymbol(currentPlayer, row, col);
 
             if (board.isWinner(currentPlayer.getSymbol()).isPresent()) {
                 game.setGameOver(true);
+                winnerFound = true;
             } else if (board.isFull()) {
                 game.setGameOver(true);
+                draw = true;
+            } else {
+                currentPlayer = (currentPlayer == player1) ? player2 : player1;
+                game.setCurrentPlayer(currentPlayer.getName());
             }
 
-            currentPlayer = (currentPlayer == player1) ? player2 : player1;
-
             game.setBoardState(board.toString());
-            game.setCurrentPlayer(currentPlayer.getName());
             gameRepository.save(game);
 
-            return new StateDTO(game.getId(), player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), game.isGameOver());
+            StateDTO stateDTO = new StateDTO(game.getId(), player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), game.isGameOver());
 
+            stateDTO.setWinnerFound(winnerFound);
+            stateDTO.setDraw(draw);
+
+            return stateDTO;
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
         }
@@ -94,13 +103,25 @@ public class GameService {
 
         Board board = loadBoardFromString(gameId);
 
+        Player[][] nextBoard = board.getCells();
+        String[][] secondBoard = new String[3][3];
+
+        for (int i = 0; i < nextBoard.length; i++) {
+            for (int j = 0; j < nextBoard[i].length; j++) {
+                Player player = nextBoard[i][j];
+                if (player != null) {
+                    char symbolPlayera = player.getSymbol();
+                    secondBoard[i][j] = "" + symbolPlayera;
+                }
+            }
+        }
+
         Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
         Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
 
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
-        // zwracamy pusty obiekt?
-        return new StateDTO();
+        return new StateDTO(gameId, player1, player2, secondBoard, 3, currentPlayer.getName(), game.isGameOver());
     }
 
     public List<Game> listGames() {
@@ -112,11 +133,11 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        char player1Symbol = game.getPlayer1Symbol();
-        char player2Symbol = game.getPlayer2Symbol();
+        Character player1Symbol = game.getPlayer1Symbol();
+        Character player2Symbol = game.getPlayer2Symbol();
         String boardState = game.getBoardState();
 
-        Board board = new Board(boardState.split("\n").length);
+        Board board = new Board(game.getBoardState().split("\n").length);
 
         Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
         Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
