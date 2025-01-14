@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Game Result</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+</head>
+<body>
+<h1 th:text="${message}"></h1>
+<a th:href="@{/game/new}">Start a new game</a>
+</body>
+</html>

@@ -8,7 +8,6 @@ import syll25.tictactoe.logic.Board;
 import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
-import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.repository.GameRepository;
@@ -62,6 +61,10 @@ public class GameService {
         Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
+        if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()) {
+            throw new IllegalArgumentException("Invalid move: row or column out of bounds");
+        }
+
         if (!board.isCellEmpty(row, col)) {
             throw new IllegalArgumentException("Cell is already occupied");
         }
@@ -92,6 +95,7 @@ public class GameService {
             stateDTO.setDraw(draw);
 
             return stateDTO;
+
         } catch (CellOccupiedException ex) {
             throw new CellOccupiedException();
         }

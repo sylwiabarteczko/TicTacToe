@@ -44,16 +44,17 @@ public class GameController {
     }
 
     @PostMapping("/move")
-    public ModelAndView makeMove(
+    public String makeMove(
             @RequestParam("gameId") Long gameId,
             @RequestParam("row") int row,
-            @RequestParam("col") int col) {
+            @RequestParam("col") int col,
+            Model model) {
 
         StateDTO stateDTO = gameService.makeMove(gameId, row, col);
 
-        ModelAndView modelAndView = new ModelAndView("game");
-        modelAndView.addObject("stateDTO", stateDTO);
-        return modelAndView;
+        model.addAttribute("stateDTO", stateDTO);
+
+        return gameViewService.redirectToResult(stateDTO);
     }
 
     @PostMapping("/load")
