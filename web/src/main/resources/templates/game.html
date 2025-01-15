@@ -30,9 +30,12 @@
                     <th th:text="${rowIndex + 1}"></th>
                     <td th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}">
                         <button type="button"
+                                th:data-row="${rowIndex}"
+                                th:data-col="${colIndex}"
+                                th:data-game-id="${stateDTO.gameId}"
                                 th:disabled="${stateDTO.board[rowIndex][colIndex] != null}"
                                 th:text="${stateDTO.board[rowIndex][colIndex] != null ? stateDTO.board[rowIndex][colIndex] : ''}"
-                                th:onclick="'location.href=\'/game/move?gameId=' + ${stateDTO.gameId} + '&row=' + ${rowIndex} + '&col=' + ${colIndex} + '\''">
+                                onclick="submitMove(this)">
                         </button>
                     </td>
                 </tr>
@@ -41,6 +44,41 @@
         </div>
     </div>
 </div>
+
+<script>
+    function submitMove(button) {
+
+        const gameId = button.getAttribute('data-game-id');
+        const row = button.getAttribute('data-row');
+        const col = button.getAttribute('data-col');
+
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = `/game/move`;
+
+        const gameIdInput = document.createElement('input');
+        gameIdInput.type = 'hidden';
+        gameIdInput.name = 'gameId';
+        gameIdInput.value = gameId;
+        form.appendChild(gameIdInput);
+
+        const rowInput = document.createElement('input');
+        rowInput.type = 'hidden';
+        rowInput.name = 'row';
+        rowInput.value = row;
+        form.appendChild(rowInput);
+
+        const colInput = document.createElement('input');
+        colInput.type = 'hidden';
+        colInput.name = 'col';
+        colInput.value = col;
+        form.appendChild(colInput);
+
+        document.body.appendChild(form);
+        form.submit();
+    }
+</script>
+
 </body>
 </html>
 

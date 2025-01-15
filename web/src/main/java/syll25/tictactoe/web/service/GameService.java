@@ -62,7 +62,7 @@ public class GameService {
         Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
 
         if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()) {
-            throw new IllegalArgumentException("Invalid move: row or column out of bounds");
+            throw new IllegalArgumentException("Invalid move: row or column out of board size");
         }
 
         if (!board.isCellEmpty(row, col)) {
