@@ -31,8 +31,8 @@ public class GameController {
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
                                @RequestParam int boardSize) {
-        Long Id = gameService.startNewGame(player1Name, player2Name, boardSize);
-        return "redirect:/game/" + Id;
+        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize);
+        return "redirect:/game/" + gameId;
     }
 
     @GetMapping("/{gameId}")

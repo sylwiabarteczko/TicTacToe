@@ -29,6 +29,13 @@ public class GameService {
             throw new RuntimeException("Failed to convert StateDTO to JSON", e);
         }
     }
+    private StateDTO jsonToState(String json) {
+        try {
+            return objectMapper.readValue(json, StateDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to convert JSON to StateDTO", e);
+        }
+    }
 
     public Long startNewGame(String player1Name, String player2Name, int boardSize) {
 
@@ -40,12 +47,12 @@ public class GameService {
         Player currentPlayer = player1;
         boolean gameOver = false;
 
-        StateDTO stateDTO = new StateDTO(null, player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), gameOver);
-
+        String[][] emptyBoard = new String[boardSize][boardSize];
+        StateDTO stateDTO = new StateDTO(null, player1, player2, emptyBoard, boardSize, currentPlayer.getName(), false);
 
         String boardStateJson = stateToJson(stateDTO);
 
-        Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), gameOver);
+        Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), false);
 
         gameRepository.save(game);
 
@@ -56,77 +63,63 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        Board board = loadBoardFromString(gameId);
-        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
-        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
-        Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
+        StateDTO stateDTO = jsonToState(game.getBoardState());
+        Board board = new Board(stateDTO.getSize());
 
-        if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()) {
-            throw new IllegalArgumentException("Invalid move: row or column out of board size");
+        Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
+        Player player2 = new Player(stateDTO.getPlayer2().name(), stateDTO.getPlayer2().sign().charAt(0));
+        Player currentPlayer = stateDTO.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
+
+        for (int i = 0; i < stateDTO.getBoard().length; i++) {
+            for (int j = 0; j < stateDTO.getBoard()[i].length; j++) {
+                if (stateDTO.getBoard()[i][j] != null) {
+                    char symbol = stateDTO.getBoard()[i][j].charAt(0);
+                    Player player = (symbol == player1.getSymbol()) ? player1 : player2;
+                    board.placeSymbol(player, i, j);
+                }
+            }
         }
-
-        if (!board.isCellEmpty(row, col)) {
-            throw new IllegalArgumentException("Cell is already occupied");
-        }
-
-        boolean winnerFound = false;
-        boolean draw = false;
 
         try {
             board.placeSymbol(currentPlayer, row, col);
 
             if (board.isWinner(currentPlayer.getSymbol()).isPresent()) {
-                game.setGameOver(true);
-                winnerFound = true;
+                stateDTO.setGameOver(true);
             } else if (board.isFull()) {
-                game.setGameOver(true);
-                draw = true;
+                stateDTO.setGameOver(true);
             } else {
-                currentPlayer = (currentPlayer == player1) ? player2 : player1;
-                game.setCurrentPlayer(currentPlayer.getName());
+                currentPlayer = currentPlayer.getName().equals(player1.getName()) ? player2 : player1;
+                stateDTO.setCurrentPlayer(currentPlayer.getName());
             }
 
-            game.setBoardState(board.toString());
+            String[][] updatedBoard = new String[board.getSize()][board.getSize()];
+            Player[][] cells = board.getCells();
+            for (int i = 0; i < cells.length; i++) {
+                for (int j = 0; j < cells[i].length; j++) {
+                    if (cells[i][j] != null) {
+                        updatedBoard[i][j] = String.valueOf(cells[i][j].getSymbol());
+                    }
+                }
+            }
+            stateDTO.setBoard(updatedBoard);
+
+            game.setBoardState(stateToJson(stateDTO));
             gameRepository.save(game);
-
-            StateDTO stateDTO = new StateDTO(game.getId(), player1, player2, board.getCells(), board.getSize(), currentPlayer.getName(), game.isGameOver());
-
-            stateDTO.setWinnerFound(winnerFound);
-            stateDTO.setDraw(draw);
 
             return stateDTO;
 
-        } catch (CellOccupiedException ex) {
+        } catch (CellOccupiedException e) {
             throw new CellOccupiedException();
         }
     }
+
 
     public StateDTO loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        Board board = loadBoardFromString(gameId);
-
-        Player[][] nextBoard = board.getCells();
-        String[][] secondBoard = new String[3][3];
-
-        for (int i = 0; i < nextBoard.length; i++) {
-            for (int j = 0; j < nextBoard[i].length; j++) {
-                Player player = nextBoard[i][j];
-                if (player != null) {
-                    char symbolPlayera = player.getSymbol();
-                    secondBoard[i][j] = "" + symbolPlayera;
-                }
-            }
+        return jsonToState(game.getBoardState());
         }
-
-        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
-        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
-
-        Player currentPlayer = game.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
-
-        return new StateDTO(gameId, player1, player2, secondBoard, 3, currentPlayer.getName(), game.isGameOver());
-    }
 
     public List<Game> listGames() {
         return gameRepository.findAll();

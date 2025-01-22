@@ -97,7 +97,6 @@ public class Game {
         return player1Symbol;
     }
 
-
     public Character getPlayer2Symbol() {
         return player2Symbol;
     }
