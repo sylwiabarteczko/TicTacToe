@@ -10,6 +10,7 @@ import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
+import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 
 import java.util.List;
@@ -48,13 +49,13 @@ public class GameService {
         boolean gameOver = false;
 
         String[][] emptyBoard = new String[boardSize][boardSize];
-        StateDTO stateDTO = new StateDTO(null, player1, player2, emptyBoard, boardSize, currentPlayer.getName(), false);
+        StateDTO stateDTO = new StateDTO(player1, player2, emptyBoard, boardSize, currentPlayer.getName(), false);
 
         String boardStateJson = stateToJson(stateDTO);
 
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), false);
 
-        gameRepository.save(game);
+        gameRepository.save(game); //Id przydzielane
 
         return game.getId();
     }
@@ -87,9 +88,9 @@ public class GameService {
                 stateDTO.setGameOver(true);
             } else if (board.isFull()) {
                 stateDTO.setGameOver(true);
+                stateDTO.setCurrentPlayer(null);
             } else {
-                currentPlayer = currentPlayer.getName().equals(player1.getName()) ? player2 : player1;
-                stateDTO.setCurrentPlayer(currentPlayer.getName());
+                stateDTO.setCurrentPlayer (currentPlayer.getName().equals(player1.getName()) ? player2.getName() : player1.getName());
             }
 
             String[][] updatedBoard = new String[board.getSize()][board.getSize()];
@@ -114,11 +115,13 @@ public class GameService {
     }
 
 
-    public StateDTO loadGame(Long gameId) {
+    public GameStateDTO loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        return jsonToState(game.getBoardState());
+        StateDTO stateDTO = jsonToState(game.getBoardState());
+
+        return new GameStateDTO(stateDTO, gameId);
         }
 
     public List<Game> listGames() {

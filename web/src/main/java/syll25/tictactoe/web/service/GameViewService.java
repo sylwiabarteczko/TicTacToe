@@ -6,8 +6,8 @@ import syll25.tictactoe.logic.state.StateDTO;
 @Service
 public class GameViewService {
 
-    public String redirectToResult(StateDTO stateDTO) {
-        if (stateDTO.isWinnerFound() || stateDTO.isDraw()) {
+    public String redirectToResult(StateDTO gameStateDTO) {
+        if (gameStateDTO.isWinnerFound() || gameStateDTO.isDraw()) {
             return "gameResult";
         } else {
             return "game";

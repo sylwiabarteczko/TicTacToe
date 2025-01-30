@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
+import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
 
@@ -37,8 +38,9 @@ public class GameController {
 
     @GetMapping("/{gameId}")
     public String viewGame(@PathVariable Long gameId, Model model) {
-        StateDTO stateDTO = gameService.loadGame(gameId);
-        model.addAttribute("stateDTO", stateDTO);
+        GameStateDTO gameStateDTO = gameService.loadGame(gameId);
+
+        model.addAttribute("gameStateDTO", gameStateDTO);
         return "game";
     }
 
@@ -49,18 +51,38 @@ public class GameController {
             @RequestParam("col") int col,
             Model model) {
 
-        StateDTO stateDTO = gameService.makeMove(gameId, row, col);
+        StateDTO gameStateDTO = gameService.makeMove(gameId, row, col);
+            model.addAttribute("gameStateDTO", gameStateDTO);
+            model.addAttribute("gameId", gameId);
 
-        model.addAttribute("stateDTO", stateDTO);
+        if (gameStateDTO.isWinnerFound()) {
+            return "redirect:/game/gameResult/" + gameStateDTO.getCurrentPlayer() + "/" + gameId;
+        }
 
-        return gameViewService.redirectToResult(stateDTO);
+        return gameViewService.redirectToResult(gameStateDTO);
+    }
+
+    @GetMapping("/gameResult/{playerName}/{gameId}")
+    public String gameResult(
+            @PathVariable String playerName,
+            @PathVariable Long gameId,
+            Model model) {
+
+        GameStateDTO gameStateDTO = gameService.loadGame(gameId);
+
+        if (gameStateDTO.isWinnerFound()) {
+            gameStateDTO.setCurrentPlayer(playerName);
+        }
+
+        model.addAttribute("gameStateDTO", gameStateDTO);
+        return "gameResult";
     }
 
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {
-        StateDTO stateDTO = gameService.loadGame(gameId);
+        GameStateDTO gameStateDTO = gameService.loadGame(gameId);
 
-        model.addAttribute("board", stateDTO);
+        model.addAttribute("gameStateDTO", gameStateDTO);
         return "game";
     }
 

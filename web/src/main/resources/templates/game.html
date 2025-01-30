@@ -8,33 +8,33 @@
 <h1>Tic Tac Toe</h1>
 
 <div>
-    <div th:if="${stateDTO.gameOver}">
-        <p th:if="${stateDTO.winnerFound}" th:text="${stateDTO.currentPlayer + ' wins!'}"></p>
-        <p th:if="${!stateDTO.winnerFound}">It's a draw!</p>
+    <div th:if="${gameStateDTO.gameOver}">
+        <p th:if="${gameStateDTO.winnerFound}" th:text="${gameStateDTO.currentPlayer + ' wins!'}"></p>
+        <p th:if="${!gameStateDTO.winnerFound}">It's a draw!</p>
         <a th:href="@{/game/new}" class="button">Start a new game</a>
     </div>
 
-    <div th:if="${!stateDTO.gameOver}">
-        <p>Current Player: <strong th:text="${stateDTO.currentPlayer}"></strong></p>
+    <div th:if="${!gameStateDTO.gameOver}">
+        <p>Current Player: <strong th:text="${gameStateDTO.currentPlayer}"></strong></p>
         <div class="game-board">
             <table>
                 <thead>
                 <tr>
                     <th></th>
-                    <th th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}"
+                    <th th:each="colIndex : ${#numbers.sequence(0, gameStateDTO.size - 1)}"
                         th:text="${'A' + colIndex}"></th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="rowIndex : ${#numbers.sequence(0, stateDTO.size - 1)}">
+                <tr th:each="rowIndex : ${#numbers.sequence(0, gameStateDTO.size - 1)}">
                     <th th:text="${rowIndex + 1}"></th>
-                    <td th:each="colIndex : ${#numbers.sequence(0, stateDTO.size - 1)}">
+                    <td th:each="colIndex : ${#numbers.sequence(0, gameStateDTO.size - 1)}">
                         <button type="button"
                                 th:data-row="${rowIndex}"
                                 th:data-col="${colIndex}"
-                                th:data-game-id="${stateDTO.gameId}"
-                                th:disabled="${stateDTO.board[rowIndex][colIndex] != null}"
-                                th:text="${stateDTO.board[rowIndex][colIndex] != null ? stateDTO.board[rowIndex][colIndex] : ''}"
+                                th:data-game-id="${gameId}"
+                                th:disabled="${gameStateDTO.board[rowIndex][colIndex] != null}"
+                                th:text="${gameStateDTO.board[rowIndex][colIndex] != null ? gameStateDTO.board[rowIndex][colIndex] : ''}"
                                 onclick="submitMove(this)">
                         </button>
                     </td>
