@@ -9,6 +9,8 @@ public class GameStateDTO {
     private boolean winnerFound;
     private boolean draw;
     private String currentPlayer;
+    public int size;
+    public boolean gameOver;
 
     public GameStateDTO(StateDTO stateDTO, Long gameId) {
         this.stateDTO = stateDTO;
@@ -16,18 +18,35 @@ public class GameStateDTO {
         this.winnerFound = stateDTO.isWinnerFound();
         this.draw = stateDTO.isDraw();
         this.currentPlayer = stateDTO.getCurrentPlayer();
+        this.size = stateDTO.size;
+        this.gameOver = stateDTO.gameOver;
+    }
+
+    public GameStateDTO() {
     }
 
     public StateDTO getStateDTO() {
         return stateDTO;
     }
 
+    public void setStateDTO(StateDTO stateDTO) {
+        this.stateDTO = stateDTO;
+    }
+
     public Long getGameId() {
         return gameId;
     }
 
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
+    }
+
     public boolean isWinnerFound() {
         return winnerFound;
+    }
+
+    public void setWinnerFound(boolean winnerFound) {
+        this.winnerFound = winnerFound;
     }
 
     public boolean isDraw() {
@@ -50,8 +69,16 @@ public class GameStateDTO {
         return stateDTO.getSize();
     }
 
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     public boolean isGameOver() {
-        return stateDTO.isGameOver();
+        return stateDTO != null && stateDTO.isGameOver();
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
 }
