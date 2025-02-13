@@ -1,123 +1,123 @@
 package syll25.tictactoe.web;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import syll25.tictactoe.logic.state.StateDTO;
-import syll25.tictactoe.web.controllers.GameController;
-import syll25.tictactoe.web.model.GameStateDTO;
-import syll25.tictactoe.web.service.GameService;
-import syll25.tictactoe.web.service.GameViewService;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@WebMvcTest(GameController.class)
+import java.net.URI;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GameControllerTest {
 
+    @LocalServerPort
+    private int port;
     @Autowired
-    private MockMvc mockMvc;
+    private TestRestTemplate restTemplate;
+    private ResponseEntity<Object> moveResponse;
 
-    @MockBean
-    private GameService gameService;
-
-    @MockBean
-    private GameViewService gameViewService;
-
-    @Test
-    public void getNewGameTest() throws Exception {
-        mockMvc.perform(get("/game/new"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("newGame"));
-    }
-    @Test
-    public void startNewGameTest() throws Exception {
-        mockMvc.perform(post("/game/start")
-                .param("player1Name", "Sylwia")
-                .param("player2Name", "Sabina")
-                .param("boardSize", "3"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrlPattern("/game/{gameId}"));
-    }
-    @Test
-    public void gameIdTest() throws Exception {
-
-        Long gameId = 1L;
-        GameStateDTO mockGameState = new GameStateDTO();
-        mockGameState.setGameId(gameId);
-        mockGameState.setWinnerFound(false);
-        mockGameState.setSize(3);
-        mockGameState.setGameOver(false);
-        mockGameState.setCurrentPlayer("X");
-
-        when(gameService.loadGame(any(Long.class))).thenReturn(mockGameState);
-
-        mockMvc.perform(get("/game/{gameId}", gameId))
-                .andExpect(status().isOk())
-                .andExpect(view().name("game"))
-                .andExpect(model().attribute("gameStateDTO", Matchers.hasProperty("gameId", Matchers.is(gameId))))
-                .andExpect(model().attribute("gameStateDTO", Matchers.hasProperty("winnerFound", Matchers.is(false))))
-                .andExpect(model().attribute("gameStateDTO", Matchers.hasProperty("size", Matchers.greaterThanOrEqualTo(3))))
-                .andExpect(model().attribute("gameStateDTO", Matchers.hasProperty("currentPlayer", Matchers.is("X"))));
+    private String createURLWithPort(String uri) {
+        return "http://localhost:" + port + uri;
     }
 
     @Test
-    void makeMoveTest() throws Exception {
-        GameStateDTO mockGameState = new GameStateDTO();
-        mockGameState.setWinnerFound(false);
-        when(gameService.makeMove(eq(1L), anyInt(), anyInt())).thenReturn(mockGameState.getStateDTO());
-        when(gameViewService.redirectToResult(any(GameStateDTO.class).getStateDTO())).thenReturn("game");
-
-        mockMvc.perform(post("/game/move")
-                        .param("gameId", "1")
-                        .param("row", "0")
-                        .param("col", "0"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("game"));
+    public void getNewGameTest() {
+        ResponseEntity<String> response = restTemplate.getForEntity(createURLWithPort("/game/new"), String.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+        assertThat(response.getBody()).contains("Start a new Tic Tac Toe Game");
     }
 
     @Test
-    public void loadGameTest() throws Exception {
+    public void startNewGameTest() {
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("player1Name", "Sylwia");
+        params.add("player2Name", "Sabina");
+        params.add("boardSize", "3");
 
-        Long gameId = 1L;
-        mockMvc.perform(post("/game/load")
-                .param("gameId", "1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("game"))
-                .andExpect(model().attributeExists("board"))
-                .andExpect(model().attribute("board", Matchers.hasProperty("gameId", Matchers.is(gameId))));
-
+        ResponseEntity<String> response = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
+        assertThat(response.getStatusCodeValue()).isEqualTo(302);
+        assertThat(response.getHeaders().getLocation().toString()).contains("/game/");
     }
-    @Test
-    void viewGameTest() throws Exception {
-        GameStateDTO mockGameState = new GameStateDTO();
-        mockGameState.setGameId(1L);
-        when(gameService.loadGame(1L)).thenReturn(mockGameState);
 
-        mockMvc.perform(get("/game/1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("game"))
-                .andExpect(model().attributeExists("gameStateDTO"));
+    @Test
+    public void testMakeMove() {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("player1Name", "Sylwia");
+        params.add("player2Name", "Sabina");
+        params.add("boardSize", "3");
+
+        ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
+        assertThat(startGameResponse.getStatusCodeValue()).isEqualTo(302);
+
+        URI location = startGameResponse.getHeaders().getLocation();
+        assertThat(location).isNotNull();
+
+        String gameUrl = location.toString();
+        String gameId = gameUrl.substring(gameUrl.lastIndexOf('/') + 1);
+
+        System.out.println("Extracted gameId: " + gameId);
+        assertThat(gameId).isNotBlank();
+
+        MultiValueMap<String, String> moveParams = new LinkedMultiValueMap<>();
+        moveParams.add("gameId", gameId);
+        moveParams.add("row", "0");
+        moveParams.add("col", "0");
+        System.out.println("Move params: " + moveParams);
+
+        ResponseEntity<String> moveResponse = restTemplate.postForEntity(createURLWithPort("/game/move"), moveParams, String.class);
+
+        assertThat(moveResponse.getBody()).isNotNull();
+
+        String responseBody = moveResponse.getBody();
+        assertThat(responseBody).contains("Tic Tac Toe");
+        assertThat(responseBody).contains("Current Player");
+        assertThat(responseBody).contains("disabled=\"disabled\"");
     }
-    @Test
-    void gameResultTest() throws Exception {
-        GameStateDTO mockGameState = new GameStateDTO();
-        mockGameState.setWinnerFound(true);
-        when(gameService.loadGame(1L)).thenReturn(mockGameState);
 
-        mockMvc.perform(get("/game/gameResult"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("gameResult"))
-                .andExpect(model().attributeExists("gameStateDTO"));
+    @Test
+    public void testGameResult() {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("player1Name", "Sylwia");
+        params.add("player2Name", "Sabina");
+        params.add("boardSize", "3");
+
+        ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
+        String gameUrl = startGameResponse.getHeaders().getLocation().toString();
+        String gameId = gameUrl.substring(gameUrl.lastIndexOf('/') + 1);
+
+        makeMoveAndAssert(gameId, 0, 0);
+        makeMoveAndAssert(gameId, 1, 0);
+        makeMoveAndAssert(gameId, 0, 1);
+        makeMoveAndAssert(gameId, 1, 1);
+        ResponseEntity<String> winningMoveResponse = makeMoveAndAssert(gameId, 0, 2);
+
+        assertThat(winningMoveResponse.getStatusCodeValue()).isEqualTo(302);
+        assertThat(winningMoveResponse.getHeaders().getLocation().toString()).contains("/game/gameResult/");
+
+        ResponseEntity<String> gameResultResponse = restTemplate.getForEntity(winningMoveResponse.getHeaders().getLocation(), String.class);
+        assertThat(gameResultResponse.getStatusCodeValue()).isEqualTo(200);
+        assertThat(gameResultResponse.getBody()).contains("Game Result");
+        assertThat(gameResultResponse.getBody()).contains("Sylwia");
+    }
+
+
+    private ResponseEntity<String> makeMoveAndAssert(String gameId, int row, int col) {
+        MultiValueMap<String, String> moveParams = new LinkedMultiValueMap<>();
+        moveParams.add("gameId", gameId);
+        moveParams.add("row", String.valueOf(row));
+        moveParams.add("col", String.valueOf(col));
+
+        ResponseEntity<String> moveResponse = restTemplate.postForEntity(createURLWithPort("/game/move"), moveParams, String.class);
+        assertThat(moveResponse.getStatusCodeValue()).isIn(200, 302);  // 302 mamy przekierowanie
+        return moveResponse;
     }
 
 }

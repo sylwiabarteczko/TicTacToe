@@ -54,19 +54,15 @@ public class GameStateDTO {
     }
 
     public String getCurrentPlayer() {
-        return stateDTO.getCurrentPlayer();
+        return currentPlayer;
     }
 
     public void setCurrentPlayer(String currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
 
-    public String[][] getBoard() {
-        return stateDTO.getBoard();
-    }
-
     public int getSize() {
-        return stateDTO.getSize();
+        return size;
     }
 
     public void setSize(int size) {
@@ -74,7 +70,7 @@ public class GameStateDTO {
     }
 
     public boolean isGameOver() {
-        return stateDTO != null && stateDTO.isGameOver();
+        return gameOver;
     }
 
     public void setGameOver(boolean gameOver) {

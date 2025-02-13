@@ -31,11 +31,13 @@ public class Game {
     @Column
     private Character player2Symbol;
 
+
     public Game() {
 
     }
 
-    public Game(String boardState, String player1Name, Character player1Symbol, String player2Name, Character player2Symbol, String currentPlayer, boolean gameOver) {
+    public Game(String boardState, String player1Name, Character player1Symbol, String player2Name,
+                Character player2Symbol, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
@@ -43,12 +45,21 @@ public class Game {
         this.gameOver = gameOver;
         this.player1Symbol = player1Symbol;
         this.player2Symbol = player2Symbol;
+
     }
+
+    public Game(long id, String player1, String player2, int size) {
+    }
+
     public Long getId() {
         return id;
     }
 
-    public String getBoardState() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getBoardState(String s) {
         return boardState;
     }
 
@@ -60,8 +71,16 @@ public class Game {
         return player1Name;
     }
 
+    public void setPlayer1Name(String sylwia) {
+        this.player1Name = player1Name;
+    }
+
     public String getPlayer2Name() {
         return player2Name;
+    }
+
+    public void setPlayer2Name(String sabina) {
+        this.player2Name = player2Name;
     }
 
     public String getCurrentPlayer() {
@@ -99,5 +118,11 @@ public class Game {
 
     public Character getPlayer2Symbol() {
         return player2Symbol;
+    }
+
+    public void setPlayer2Symbol(char o) {
+    }
+
+    public void setPlayer1Symbol(char x) {
     }
 }

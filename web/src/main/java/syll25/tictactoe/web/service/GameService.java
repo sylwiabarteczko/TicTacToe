@@ -53,7 +53,8 @@ public class GameService {
 
         String boardStateJson = stateToJson(stateDTO);
 
-        Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(), player2.getSymbol(), currentPlayer.getName(), false);
+        Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(),
+                player2.getSymbol(), currentPlayer.getName(),false );
 
         gameRepository.save(game); //Id przydzielane
 
@@ -64,7 +65,7 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        StateDTO stateDTO = jsonToState(game.getBoardState());
+        StateDTO stateDTO = jsonToState(game.getBoardState("XOX,O,O"));
         Board board = new Board(stateDTO.getSize());
 
         Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
@@ -119,7 +120,7 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        StateDTO stateDTO = jsonToState(game.getBoardState());
+        StateDTO stateDTO = jsonToState(game.getBoardState("XOX,O,O"));
 
         return new GameStateDTO(stateDTO, gameId);
         }
@@ -135,14 +136,14 @@ public class GameService {
 
         Character player1Symbol = game.getPlayer1Symbol();
         Character player2Symbol = game.getPlayer2Symbol();
-        String boardState = game.getBoardState();
+        String boardState = game.getBoardState("XOX,O,O");
 
-        Board board = new Board(game.getBoardState().split("\n").length);
+        Board board = new Board(game.getBoardState("XOX,O,O").split("\n").length);
 
         Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
         Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
 
-        String[] rows = game.getBoardState().split("\n");
+        String[] rows = game.getBoardState("XOX,O,O").split("\n");
         for (int row = 0; row < rows.length; row++) {
             String[] cells = rows[row].split(" ");
             for (int col = 0; col < cells.length; col++) {
