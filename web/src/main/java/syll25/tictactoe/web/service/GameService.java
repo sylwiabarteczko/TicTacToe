@@ -125,8 +125,8 @@ public class GameService {
         return new GameStateDTO(stateDTO, gameId);
         }
 
-    public List<Game> listGames() {
-        return gameRepository.findAll();
+    public List<Game> listActiveGames() {
+        return gameRepository.findByActiveGame();
     }
 
     private Board loadBoardFromString(Long gameId) {

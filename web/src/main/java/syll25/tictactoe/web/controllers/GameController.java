@@ -86,12 +86,11 @@ public class GameController {
         return "game";
     }
 
-    // TODO na potem :D  - lista aktywnych gier
     @GetMapping("/list-games")
     public String listGames(Model model) {
-        List<Game> games = gameService.listGames();
-        model.addAttribute("games", games);
-        return "games";
+        List<Game> activeGames = gameService.listActiveGames();
+        model.addAttribute("games", activeGames);
+        return "gameList";
     }
 
 

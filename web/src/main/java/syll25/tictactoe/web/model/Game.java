@@ -59,7 +59,7 @@ public class Game {
         this.id = id;
     }
 
-    public String getBoardState(String s) {
+    public String getBoardState(String boardState) {
         return boardState;
     }
 
@@ -71,7 +71,7 @@ public class Game {
         return player1Name;
     }
 
-    public void setPlayer1Name(String sylwia) {
+    public void setPlayer1Name(String player1Name) {
         this.player1Name = player1Name;
     }
 
@@ -79,7 +79,7 @@ public class Game {
         return player2Name;
     }
 
-    public void setPlayer2Name(String sabina) {
+    public void setPlayer2Name(String player2Name) {
         this.player2Name = player2Name;
     }
 
