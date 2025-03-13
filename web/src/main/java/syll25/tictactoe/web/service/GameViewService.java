@@ -6,11 +6,11 @@ import syll25.tictactoe.logic.state.StateDTO;
 @Service
 public class GameViewService {
 
-    public String redirectToResult(StateDTO gameStateDTO) {
+    public String redirectToResult(StateDTO gameStateDTO, Long gameId) {
         if (gameStateDTO.isWinnerFound() || gameStateDTO.isDraw()) {
             return "gameResult";
         } else {
-            return "game";
+            return "redirect:/game/" + gameId;
         }
     }
 

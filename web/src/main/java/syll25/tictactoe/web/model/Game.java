@@ -22,7 +22,7 @@ public class Game {
     @Column(name = "current_player")
     private String currentPlayer;
 
-    @Column(name = "game_over")
+    @Column(name = "game_over", nullable = false)
     private boolean gameOver;
 
     @Column
@@ -59,8 +59,8 @@ public class Game {
         this.id = id;
     }
 
-    public String getBoardState(String boardState) {
-        return boardState;
+    public String getBoardState() {
+        return this.boardState;
     }
 
     public void setBoardState(String boardState) {

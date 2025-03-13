@@ -13,7 +13,6 @@ public class StateDTO {
     public String currentPlayer;
     public boolean gameOver;
 
-
     public StateDTO(Player player1, Player player2, String[][] board, int size, String currentPlayer, boolean gameOver) {
         this.player1 = new PlayerDTO(player1.getName(), String.valueOf(player1.getSymbol()));
         this.player2 = new PlayerDTO(player2.getName(), String.valueOf(player2.getSymbol()));
@@ -62,6 +61,7 @@ public class StateDTO {
         return player1;
     }
 
+
     public PlayerDTO getPlayer2() {
         return player2;
     }
@@ -77,5 +77,11 @@ public class StateDTO {
     public boolean isDraw() {
         return gameOver && currentPlayer == null;
     }
+    public void setPlayer1(PlayerDTO player1) {
+        this.player1 = player1;
+    }
 
+    public void setPlayer2(PlayerDTO player2) {
+        this.player2 = player2;
+    }
 }

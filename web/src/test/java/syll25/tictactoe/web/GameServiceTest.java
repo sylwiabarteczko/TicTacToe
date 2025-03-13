@@ -42,7 +42,7 @@ public class GameServiceTest {
         verify(gameRepository).save(argThat(game ->
                 game.getPlayer1Name().equals("Player1") &&
                 game.getPlayer2Name().equals("Player2") &&
-                game.getBoardState("XOX,O,O") != null));
+                game.getBoardState() != null));
     }
 
     @Test

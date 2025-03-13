@@ -10,6 +10,7 @@ import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -24,10 +25,19 @@ public class GameController {
         this.gameViewService = gameViewService;
     }
 
+    @GetMapping("/list-games")
+    public String listGames(Model model) {
+        List<Game> activeGames = gameService.listActiveGames();
+        activeGames.sort(Comparator.comparing(Game::getId));
+        model.addAttribute("games", activeGames);
+        return "gameList";
+    }
+
     @GetMapping("/new")
     public String newGameForm() {
         return "newGame";
     }
+
     @PostMapping("/start")
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
@@ -52,14 +62,14 @@ public class GameController {
             Model model) {
 
         StateDTO gameStateDTO = gameService.makeMove(gameId, row, col);
-            model.addAttribute("gameStateDTO", gameStateDTO);
-            model.addAttribute("gameId", gameId);
+        model.addAttribute("gameStateDTO", gameStateDTO);
+        model.addAttribute("gameId", gameId);
 
         if (gameStateDTO.isWinnerFound()) {
             return "redirect:/game/gameResult/" + gameStateDTO.getCurrentPlayer() + "/" + gameId;
         }
 
-        return gameViewService.redirectToResult(gameStateDTO);
+        return gameViewService.redirectToResult(gameStateDTO, gameId);
     }
 
     @GetMapping("/gameResult/{playerName}/{gameId}")
@@ -85,13 +95,5 @@ public class GameController {
         model.addAttribute("gameStateDTO", gameStateDTO);
         return "game";
     }
-
-    @GetMapping("/list-games")
-    public String listGames(Model model) {
-        List<Game> activeGames = gameService.listActiveGames();
-        model.addAttribute("games", activeGames);
-        return "gameList";
-    }
-
 
 }

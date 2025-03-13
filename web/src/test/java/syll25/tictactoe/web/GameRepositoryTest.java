@@ -67,7 +67,7 @@ public class GameRepositoryTest {
         assertThat(foundGame.get().getPlayer1Name()).isEqualTo("Sylwia");
         assertThat(foundGame.get().getPlayer2Name()).isEqualTo("Sabina");
         assertThat(foundGame.get().getCurrentPlayer()).isEqualTo("Sylwia");
-        assertThat(foundGame.get().getBoardState("XOX,O,O")).isEqualTo("XOX,O,O");
+        assertThat(foundGame.get().getBoardState()).isEqualTo("XOX,O,O");
     }
 }
 
