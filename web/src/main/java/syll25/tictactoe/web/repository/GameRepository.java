@@ -13,7 +13,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
     @Query("SELECT g " +
             "FROM Game g " +
             "WHERE g.gameOver = false " +
-            "ORDER BY g.id ASC")
+            "ORDER BY g.createdDate DESC")
     List<Game> findByActiveGame();
 
 }

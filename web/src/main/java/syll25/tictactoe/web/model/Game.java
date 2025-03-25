@@ -2,6 +2,8 @@ package syll25.tictactoe.web.model;
 
 import jakarta.persistence.*;
 
+import java.time.ZonedDateTime;
+
 @Table(name = "game_states")
 @Entity
 public class Game {
@@ -31,6 +33,8 @@ public class Game {
     @Column
     private Character player2Symbol;
 
+    @Column
+    private ZonedDateTime createdDate;
 
     public Game() {
 
@@ -45,6 +49,7 @@ public class Game {
         this.gameOver = gameOver;
         this.player1Symbol = player1Symbol;
         this.player2Symbol = player2Symbol;
+        this.createdDate = ZonedDateTime.now();
 
     }
 
@@ -124,5 +129,11 @@ public class Game {
     }
 
     public void setPlayer1Symbol(char x) {
+    }
+    public ZonedDateTime getCreatedDate() {
+        return createdDate;
+    }
+    public void setCreatedDate(ZonedDateTime createdDate) {
+        this.createdDate = createdDate;
     }
 }

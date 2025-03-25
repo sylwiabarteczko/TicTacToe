@@ -9,8 +9,6 @@ import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
-
-import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -28,7 +26,6 @@ public class GameController {
     @GetMapping("/list-games")
     public String listGames(Model model) {
         List<Game> activeGames = gameService.listActiveGames();
-        activeGames.sort(Comparator.comparing(Game::getId));
         model.addAttribute("games", activeGames);
         return "gameList";
     }
