@@ -36,7 +36,7 @@ public class GameServiceTest {
            saveGame.setId(50L);
            return saveGame;
         });
-        Long gameId = gameService.startNewGame("Player1", "Player2", 3);
+        Long gameId = gameService.startNewGame("Player1", 3);
         assertEquals(50L, gameId);
 
         verify(gameRepository).save(argThat(game ->
@@ -47,7 +47,7 @@ public class GameServiceTest {
 
     @Test
     void makeMoveTest() {
-        Long gameId = gameService.startNewGame("Player1", "Player2", 3);
+        Long gameId = gameService.startNewGame("Player1", 3);
         StateDTO gameStateDTO = gameService.makeMove(gameId, 0, 0);
         assertNotNull(gameStateDTO);
         assertFalse(gameStateDTO.isWinnerFound());

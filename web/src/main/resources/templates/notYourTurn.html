@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Not your turn</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+</head>
+<body>
+<h1>Warning!</h1>
+
+<p style="color:red;" th:text="${error}"></p>
+
+<a th:href="@{'/game/' + ${gameStateDTO.gameId}}">Back to the game</a>
+</body>
+</html>

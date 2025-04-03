@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import syll25.tictactoe.logic.Board;
 import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
@@ -12,8 +14,6 @@ import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
-
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -39,13 +39,13 @@ public class GameService {
         }
     }
 
-    public Long startNewGame(String player1Name, String player2Name, int boardSize) {
+    public Long startNewGame(String player1Name, int boardSize) {
 
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
         Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
-        Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
+        Player player2 = new Player(null, symbolChoice.drawSymbol());
         Player currentPlayer = player1;
         boolean gameOver = false;
 
@@ -62,12 +62,17 @@ public class GameService {
         return game.getId();
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public StateDTO makeMove(Long gameId, int row, int col) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
         StateDTO stateDTO = jsonToState(game.getBoardState());
         Board board = new Board(stateDTO.getSize());
+
+        if (!stateDTO.getCurrentPlayer().equals(game.getCurrentPlayer())) {
+            throw new IllegalStateException("Error");
+        }
 
         Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
         Player player2 = new Player(stateDTO.getPlayer2().name(), stateDTO.getPlayer2().sign().charAt(0));
@@ -158,5 +163,15 @@ public class GameService {
         }
         return board;
     }
+
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+    }
+
+    public void save(Game game) {
+        gameRepository.save(game);
+    }
+
 
 }

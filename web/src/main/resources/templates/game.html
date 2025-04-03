@@ -16,6 +16,19 @@
 
     <div th:if="${!gameStateDTO.gameOver}">
         <p>Current Player: <strong th:text="${gameStateDTO.currentPlayer}"></strong></p>
+        <div th:if="${#authorization.expression('isAuthenticated()')}">
+            <div th:if="${isPlayer1 or isPlayer2}">
+            <p th:if="${#authentication.name == gameStateDTO.currentPlayer}" style="color:green;">
+                It's your turn!
+            </p>
+            <p th:if="${#authentication.name != gameStateDTO.currentPlayer}" style="color:gray;">
+                Please wait for your turn.
+            </p>
+        </div>
+            <div th:if="${!isPlayer1 and !isPlayer2}" style="color:red;">
+                You are not a player in this game.
+            </div>
+        </div>
         <div class="game-board">
             <table>
                 <thead>

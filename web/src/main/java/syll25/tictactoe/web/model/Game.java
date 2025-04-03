@@ -1,6 +1,7 @@
 package syll25.tictactoe.web.model;
 
 import jakarta.persistence.*;
+import syll25.tictactoe.logic.state.StateDTO;
 
 import java.time.ZonedDateTime;
 
@@ -12,6 +13,9 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     @Column(name = "board_state", columnDefinition = "TEXT")
     private String boardState;
 
@@ -21,7 +25,7 @@ public class Game {
     @Column(name = "player2_name")
     private String player2Name;
 
-    @Column(name = "current_player")
+    @Column(name = "current_player", nullable = false)
     private String currentPlayer;
 
     @Column(name = "game_over", nullable = false)
@@ -136,4 +140,10 @@ public class Game {
     public void setCreatedDate(ZonedDateTime createdDate) {
         this.createdDate = createdDate;
     }
+
+    public void updateFromStateDTO(StateDTO stateDTO) {
+        this.currentPlayer = stateDTO.getCurrentPlayer();
+        this.gameOver = stateDTO.isGameOver();
+    }
 }
+

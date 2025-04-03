@@ -9,7 +9,10 @@ import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
+
+import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/game")
@@ -36,37 +39,72 @@ public class GameController {
     }
 
     @PostMapping("/start")
-    public String startNewGame(@RequestParam String player1Name,
-                               @RequestParam String player2Name,
-                               @RequestParam int boardSize) {
-        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize);
+    public String startNewGame(@RequestParam int boardSize,
+                               Principal principal) {
+        String player1Name = principal.getName();
+        Long gameId = gameService.startNewGame(player1Name, boardSize);
         return "redirect:/game/" + gameId;
     }
 
     @GetMapping("/{gameId}")
-    public String viewGame(@PathVariable Long gameId, Model model) {
+    public String viewGame(@PathVariable Long gameId,
+                           Principal principal,
+                           Model model)
+            throws AccessDeniedException {
+        Game game = gameService.getGameById(gameId);
+        String username = principal.getName();
+
+        if(!username.equals(game.getPlayer1Name()) && !username.equals(game.getPlayer2Name())) {
+            throw new AccessDeniedException("You are not allow to access this game. ");
+        }
+
+        if (game.getPlayer2Name() == null && !username.equals(game.getPlayer1Name())) {
+            game.setPlayer2Name(username);
+            gameService.save(game);
+        }
         GameStateDTO gameStateDTO = gameService.loadGame(gameId);
 
+        boolean isPlayer1 = username.equals(game.getPlayer1Name());
+        boolean isPlayer2 = username.equals(game.getPlayer2Name());
+
+        model.addAttribute("isPlayer1", isPlayer1);
+        model.addAttribute("isPlayer2", isPlayer2);
         model.addAttribute("gameStateDTO", gameStateDTO);
         return "game";
     }
+
 
     @PostMapping("/move")
     public String makeMove(
             @RequestParam("gameId") Long gameId,
             @RequestParam("row") int row,
             @RequestParam("col") int col,
+            Principal principal,
             Model model) {
 
-        StateDTO gameStateDTO = gameService.makeMove(gameId, row, col);
-        model.addAttribute("gameStateDTO", gameStateDTO);
-        model.addAttribute("gameId", gameId);
+        Game game = gameService.getGameById(gameId);
+        String currentPlayer = game.getCurrentPlayer();
 
-        if (gameStateDTO.isWinnerFound()) {
-            return "redirect:/game/gameResult/" + gameStateDTO.getCurrentPlayer() + "/" + gameId;
+        if (!principal.getName().equals(currentPlayer)) {
+            model.addAttribute("error", "Nie twoja kolej!");
+            model.addAttribute("gameStateDTO", gameService.loadGame(gameId));
+            return "notYourTurn";
         }
 
-        return gameViewService.redirectToResult(gameStateDTO, gameId);
+        try {
+            StateDTO updatedState = gameService.makeMove(gameId, row, col);
+            model.addAttribute("gameStateDTO", new GameStateDTO(updatedState, gameId));
+            model.addAttribute("gameId", gameId);
+
+            if (updatedState.isWinnerFound()) {
+                return "redirect:/game/gameResult/" + updatedState.getCurrentPlayer() + "/" + gameId;
+            }
+            return "redirect:/game/" + gameId;
+
+        } catch (IllegalStateException e) {
+            model.addAttribute("error", "Wrong move");
+            return "error";
+        }
     }
 
     @GetMapping("/gameResult/{playerName}/{gameId}")
