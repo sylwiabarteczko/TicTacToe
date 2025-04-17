@@ -129,12 +129,14 @@ public class Game {
         return player2Symbol;
     }
 
-    public void setPlayer2Symbol(char o) {
+    public void setPlayer1Symbol(Character player1Symbol) {
+        this.player1Symbol = player1Symbol;
     }
 
-    public void setPlayer1Symbol(char x) {
+    public void setPlayer2Symbol(Character player2Symbol) {
+        this.player2Symbol = player2Symbol;
     }
-    public ZonedDateTime getCreatedDate() {
+        public ZonedDateTime getCreatedDate() {
         return createdDate;
     }
     public void setCreatedDate(ZonedDateTime createdDate) {

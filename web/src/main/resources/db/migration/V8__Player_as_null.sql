@@ -1,0 +1,2 @@
+ALTER TABLE game_states
+ALTER COLUMN player2_name DROP NOT NULL;

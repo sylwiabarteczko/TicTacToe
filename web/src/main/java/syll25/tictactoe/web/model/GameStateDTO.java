@@ -15,15 +15,33 @@ public class GameStateDTO {
     public GameStateDTO(StateDTO stateDTO, Long gameId) {
         this.stateDTO = stateDTO;
         this.gameId = gameId;
-        this.winnerFound = stateDTO.isWinnerFound();
-        this.draw = stateDTO.isDraw();
+        this.winnerFound = false;
+        this.draw = false;
         this.currentPlayer = stateDTO.getCurrentPlayer();
         this.size = stateDTO.size;
         this.gameOver = stateDTO.gameOver;
     }
 
     public GameStateDTO() {
+        this.stateDTO = null;
+        this.gameId = null;
+        this.winnerFound = false;
+        this.draw = false;
+        this.currentPlayer = null;
+        this.size = 0;
+        this.gameOver = false;
     }
+
+    public GameStateDTO(StateDTO stateDTO, String currentPlayer, boolean gameOver, boolean winnerFound) {
+        this.stateDTO = stateDTO;
+        this.gameId = null;
+        this.winnerFound = winnerFound;
+        this.draw = false;
+        this.currentPlayer = currentPlayer;
+        this.size = stateDTO.getSize();
+        this.gameOver = gameOver;
+    }
+
 
     public StateDTO getStateDTO() {
         return stateDTO;

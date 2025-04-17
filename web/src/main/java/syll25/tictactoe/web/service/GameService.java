@@ -31,6 +31,7 @@ public class GameService {
             throw new RuntimeException("Failed to convert StateDTO to JSON", e);
         }
     }
+
     private StateDTO jsonToState(String json) {
         try {
             return objectMapper.readValue(json, StateDTO.class);
@@ -39,15 +40,15 @@ public class GameService {
         }
     }
 
+    @Transactional
     public Long startNewGame(String player1Name, int boardSize) {
 
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
         Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
-        Player player2 = new Player(null, symbolChoice.drawSymbol());
+        Player player2 = new Player("Player", symbolChoice.drawSymbol());
         Player currentPlayer = player1;
-        boolean gameOver = false;
 
         String[][] emptyBoard = new String[boardSize][boardSize];
         StateDTO stateDTO = new StateDTO(player1, player2, emptyBoard, boardSize, currentPlayer.getName(), false);
@@ -55,28 +56,38 @@ public class GameService {
         String boardStateJson = stateToJson(stateDTO);
 
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(),
-                player2.getSymbol(), currentPlayer.getName(),false );
+                player2.getSymbol(), currentPlayer.getName(), false);
 
+        game.setCurrentPlayer(player1.getName());
         gameRepository.save(game); //Id przydzielane
 
         return game.getId();
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public StateDTO makeMove(Long gameId, int row, int col) {
+    public StateDTO makeMove(Long gameId, int row, int col, String currentUsername) {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+
+        if (!currentUsername.equals(game.getPlayer1Name()) &&
+                !currentUsername.equals(game.getPlayer2Name())) {
+            throw new IllegalStateException("Not a game participant");
+        }
+
+        if (!currentUsername.equals(game.getCurrentPlayer())) {
+            throw new IllegalStateException("Not your turn");
+        }
+
+        if (game.getPlayer2Name().equals("Player") && !currentUsername.equals(game.getPlayer1Name())) {
+            game.setPlayer2Name(currentUsername);
+        }
 
         StateDTO stateDTO = jsonToState(game.getBoardState());
         Board board = new Board(stateDTO.getSize());
 
-        if (!stateDTO.getCurrentPlayer().equals(game.getCurrentPlayer())) {
-            throw new IllegalStateException("Error");
-        }
-
         Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
         Player player2 = new Player(stateDTO.getPlayer2().name(), stateDTO.getPlayer2().sign().charAt(0));
-        Player currentPlayer = stateDTO.getCurrentPlayer().equals(player1.getName()) ? player1 : player2;
+        Player currentPlayer = currentUsername.equals(player1.getName()) ? player1 : player2;
 
         for (int i = 0; i < stateDTO.getBoard().length; i++) {
             for (int j = 0; j < stateDTO.getBoard()[i].length; j++) {
@@ -93,11 +104,12 @@ public class GameService {
 
             if (board.isWinner(currentPlayer.getSymbol()).isPresent()) {
                 stateDTO.setGameOver(true);
+                stateDTO.setCurrentPlayer("GAME_OVER");
             } else if (board.isFull()) {
                 stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer(null);
+                stateDTO.setCurrentPlayer("GAME_OVER");
             } else {
-                stateDTO.setCurrentPlayer (currentPlayer.getName().equals(player1.getName()) ? player2.getName() : player1.getName());
+                stateDTO.setCurrentPlayer(currentPlayer.getName().equals(player1.getName()) ? player2.getName() : player1.getName());
             }
 
             String[][] updatedBoard = new String[board.getSize()][board.getSize()];
@@ -113,8 +125,10 @@ public class GameService {
 
             game.setBoardState(stateToJson(stateDTO));
             game.setGameOver(stateDTO.isGameOver());
-            gameRepository.save(game);
+            game.setCurrentPlayer(stateDTO.getCurrentPlayer());
 
+
+            gameRepository.save(game);
             return stateDTO;
 
         } catch (CellOccupiedException e) {
@@ -127,10 +141,8 @@ public class GameService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
-        StateDTO stateDTO = jsonToState(game.getBoardState());
-
-        return new GameStateDTO(stateDTO, gameId);
-        }
+        return new GameStateDTO(jsonToState(game.getBoardState()), gameId);
+    }
 
     public List<Game> listActiveGames() {
         return gameRepository.findByActiveGame();
@@ -173,5 +185,55 @@ public class GameService {
         gameRepository.save(game);
     }
 
+    public boolean checkWinner(StateDTO stateDTO) {
+        Board board = new Board(stateDTO.getSize());
 
+        Player player1 = new Player(
+                stateDTO.getPlayer1().name(),
+                stateDTO.getPlayer1().sign().charAt(0)
+        );
+        Player player2 = new Player(
+                stateDTO.getPlayer2().name(),
+                stateDTO.getPlayer2().sign().charAt(0)
+        );
+        String[][] currentBoard = stateDTO.getBoard();
+        for (int row = 0; row < currentBoard.length; row++) {
+            for (int col = 0; col < currentBoard[row].length; col++) {
+                if (currentBoard[row][col] != null) {
+                    char symbol = currentBoard[row][col].charAt(0);
+                    Player currentPlayer = symbol == player1.getSymbol() ? player1 : player2;
+                    board.placeSymbol(currentPlayer, row, col);
+                }
+            }
+
+        }
+        char lastPlayerSymbol = stateDTO.getCurrentPlayer().equals(player1.getName()) ? player2.getSymbol() : player1.getSymbol();
+        return board.isWinner(lastPlayerSymbol).isPresent();
+    }
+
+    public Game loadGameEntity(Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
+    }
+
+    public StateDTO convertToStateDTO(Game game) {
+        try {
+            return objectMapper.readValue(game.getBoardState(), StateDTO.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to deserialize board state", e);
+        }
+    }
+    public GameStateDTO convertToGameStateDTO(Game game) {
+        StateDTO stateDTO = convertToStateDTO(game);
+        return new GameStateDTO(
+                stateDTO,
+                game.getCurrentPlayer(),
+                game.isGameOver(),
+                checkWinner(stateDTO)
+        );
+    }
 }
+
+
+
+

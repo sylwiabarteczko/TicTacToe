@@ -1,6 +1,7 @@
 package syll25.tictactoe.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,6 @@ import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.security.Principal;
 
@@ -22,6 +22,7 @@ public class GameController {
 
     @Autowired
     public GameController(GameService gameService, GameViewService gameViewService) {
+
         this.gameService = gameService;
         this.gameViewService = gameViewService;
     }
@@ -42,6 +43,7 @@ public class GameController {
     public String startNewGame(@RequestParam int boardSize,
                                Principal principal) {
         String player1Name = principal.getName();
+
         Long gameId = gameService.startNewGame(player1Name, boardSize);
         return "redirect:/game/" + gameId;
     }
@@ -49,79 +51,70 @@ public class GameController {
     @GetMapping("/{gameId}")
     public String viewGame(@PathVariable Long gameId,
                            Principal principal,
-                           Model model)
-            throws AccessDeniedException {
+                           Model model) {
         Game game = gameService.getGameById(gameId);
         String username = principal.getName();
 
-        if(!username.equals(game.getPlayer1Name()) && !username.equals(game.getPlayer2Name())) {
-            throw new AccessDeniedException("You are not allow to access this game. ");
+        if (!username.equals(game.getPlayer1Name())) {
+            if (game.getPlayer2Name().equals("Player")) {
+                game.setPlayer2Name(username);
+                if (game.getCurrentPlayer() == null) {
+                    game.setCurrentPlayer(game.getPlayer1Name());
+                }
+                gameService.save(game);
+            } else if (!username.equals(game.getPlayer2Name())) {
+                model.addAttribute("error", "You are not a player in this game.");
+                return "error";
+            }
         }
 
-        if (game.getPlayer2Name() == null && !username.equals(game.getPlayer1Name())) {
-            game.setPlayer2Name(username);
-            gameService.save(game);
-        }
         GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-
-        boolean isPlayer1 = username.equals(game.getPlayer1Name());
-        boolean isPlayer2 = username.equals(game.getPlayer2Name());
-
-        model.addAttribute("isPlayer1", isPlayer1);
-        model.addAttribute("isPlayer2", isPlayer2);
+        model.addAttribute("isPlayer1", username.equals(game.getPlayer1Name()));
+        model.addAttribute("isPlayer2", username.equals(game.getPlayer2Name()));
         model.addAttribute("gameStateDTO", gameStateDTO);
+        model.addAttribute("gameId", gameId);
+
         return "game";
     }
 
-
     @PostMapping("/move")
-    public String makeMove(
+    @ResponseBody
+    public GameStateDTO makeMove(
             @RequestParam("gameId") Long gameId,
             @RequestParam("row") int row,
             @RequestParam("col") int col,
-            Principal principal,
-            Model model) {
+            Principal principal) {
 
         Game game = gameService.getGameById(gameId);
-        String currentPlayer = game.getCurrentPlayer();
+        String username = principal.getName();
 
-        if (!principal.getName().equals(currentPlayer)) {
-            model.addAttribute("error", "Nie twoja kolej!");
-            model.addAttribute("gameStateDTO", gameService.loadGame(gameId));
-            return "notYourTurn";
+        if(game.getCurrentPlayer() == null) {
+            game.setCurrentPlayer(game.getPlayer1Name());
+            gameService.save(game);
         }
 
-        try {
-            StateDTO updatedState = gameService.makeMove(gameId, row, col);
-            model.addAttribute("gameStateDTO", new GameStateDTO(updatedState, gameId));
-            model.addAttribute("gameId", gameId);
-
-            if (updatedState.isWinnerFound()) {
-                return "redirect:/game/gameResult/" + updatedState.getCurrentPlayer() + "/" + gameId;
-            }
-            return "redirect:/game/" + gameId;
-
-        } catch (IllegalStateException e) {
-            model.addAttribute("error", "Wrong move");
-            return "error";
+        if (!username.equals(game.getCurrentPlayer())) {
+            throw new IllegalStateException("Not your turn");
         }
+
+        StateDTO updatedState = gameService.makeMove(gameId, row, col, username);
+        return new GameStateDTO(updatedState, gameId);
+    }
+    @GetMapping("/{gameId}/state")
+    public ResponseEntity<GameStateDTO> getGameState(@PathVariable Long gameId) {
+        Game game = gameService.loadGameEntity(gameId);
+        GameStateDTO gameStateDTO = gameService.convertToGameStateDTO(game);
+        return ResponseEntity.ok(gameStateDTO);
     }
 
     @GetMapping("/gameResult/{playerName}/{gameId}")
-    public String gameResult(
-            @PathVariable String playerName,
-            @PathVariable Long gameId,
-            Model model) {
-
+    public String gameResult(@PathVariable String playerName,
+                             @PathVariable Long gameId, Model model) {
         GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-
-        if (gameStateDTO.isWinnerFound()) {
-            gameStateDTO.setCurrentPlayer(playerName);
-        }
-
         model.addAttribute("gameStateDTO", gameStateDTO);
         return "gameResult";
     }
+
 
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {
@@ -131,4 +124,6 @@ public class GameController {
         return "game";
     }
 
+
 }
+

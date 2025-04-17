@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <link rel="stylesheet" th:href="@{/css/game.css}">
+</head>
+<body>
+<h1 style="color: red;">Access Denied</h1>
+<p th:text="${error}">Something went wrong.</p>
+<a th:href="@{/game/list-games}">Back to game list</a>
+</body>
+</html>
