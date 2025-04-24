@@ -18,6 +18,8 @@
         <label for="boardSize">Board Size:</label>
         <input type="number" id="boardSize" name="boardSize" min="3" max="10" value="3" required>
 
+        <input type="hidden" name="player1Login" th:value="${#authentication.name}" />
+
         <button type="submit">Start Game</button>
     </form>
 </div>

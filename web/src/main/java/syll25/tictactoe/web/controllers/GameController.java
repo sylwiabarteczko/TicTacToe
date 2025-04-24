@@ -1,13 +1,13 @@
 package syll25.tictactoe.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
+import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
 
@@ -40,11 +40,11 @@ public class GameController {
     }
 
     @PostMapping("/start")
-    public String startNewGame(@RequestParam int boardSize,
-                               Principal principal) {
-        String player1Name = principal.getName();
-
-        Long gameId = gameService.startNewGame(player1Name, boardSize);
+    public String startNewGame(@RequestParam String player1Name,
+                               @RequestParam String player2Name,
+                               @RequestParam int boardSize,
+                               @RequestParam String player1Login) {
+        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, player1Login);
         return "redirect:/game/" + gameId;
     }
 
@@ -53,25 +53,34 @@ public class GameController {
                            Principal principal,
                            Model model) {
         Game game = gameService.getGameById(gameId);
-        String username = principal.getName();
+        String login = principal.getName();
 
-        if (!username.equals(game.getPlayer1Name())) {
-            if (game.getPlayer2Name().equals("Player")) {
-                game.setPlayer2Name(username);
-                if (game.getCurrentPlayer() == null) {
-                    game.setCurrentPlayer(game.getPlayer1Name());
-                }
-                gameService.save(game);
-            } else if (!username.equals(game.getPlayer2Name())) {
-                model.addAttribute("error", "You are not a player in this game.");
-                return "error";
-            }
+        if (game.getPlayer1Login() == null && login != null) {
+            game.setPlayer1Login(login);
+            gameService.save(game);
+        } else if (game.getPlayer2Login() == null && !login.equals(game.getPlayer1Login())) {
+            game.setPlayer2Login(login);
+            gameService.save(game);
+        } else if (!login.equals(game.getPlayer1Login()) && !login.equals(game.getPlayer2Login())) {
+            model.addAttribute("error", "You are not a player in this game.");
+            return "error";
+        }
+
+        boolean isPlayer1 = login.equals(game.getPlayer1Login());
+        boolean isPlayer2 = login.equals(game.getPlayer2Login());
+
+        if (!isPlayer1 && !isPlayer2) {
+            model.addAttribute("error", "You are not a player in this game.");
+            return "error";
         }
 
         GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-        model.addAttribute("isPlayer1", username.equals(game.getPlayer1Name()));
-        model.addAttribute("isPlayer2", username.equals(game.getPlayer2Name()));
         model.addAttribute("gameStateDTO", gameStateDTO);
+
+        model.addAttribute("isPlayer1", isPlayer1);
+        model.addAttribute("isPlayer2", isPlayer2);
+        model.addAttribute("player1Name", game.getPlayer1Name());
+        model.addAttribute("player2Name", game.getPlayer2Name());
         model.addAttribute("gameId", gameId);
 
         return "game";
@@ -79,42 +88,42 @@ public class GameController {
 
     @PostMapping("/move")
     @ResponseBody
-    public GameStateDTO makeMove(
+    public MoveResponseDTO makeMove(
             @RequestParam("gameId") Long gameId,
             @RequestParam("row") int row,
             @RequestParam("col") int col,
             Principal principal) {
 
         Game game = gameService.getGameById(gameId);
-        String username = principal.getName();
+        String login = principal.getName();
 
-        if(game.getCurrentPlayer() == null) {
-            game.setCurrentPlayer(game.getPlayer1Name());
-            gameService.save(game);
-        }
+        String playerName = login.equals(game.getPlayer1Login())
+                ? game.getPlayer1Name()
+                : game.getPlayer2Name();
 
-        if (!username.equals(game.getCurrentPlayer())) {
+        if (!playerName.equals(game.getCurrentPlayer())) {
             throw new IllegalStateException("Not your turn");
         }
 
-        StateDTO updatedState = gameService.makeMove(gameId, row, col, username);
-        return new GameStateDTO(updatedState, gameId);
+        StateDTO updatedState = gameService.makeMove(gameId, row, col, playerName);
+        boolean yourTurn = updatedState.getCurrentPlayer().equals(playerName);
+        return new MoveResponseDTO(updatedState, yourTurn);
     }
+
     @GetMapping("/{gameId}/state")
-    public ResponseEntity<GameStateDTO> getGameState(@PathVariable Long gameId) {
+    @ResponseBody
+    public MoveResponseDTO getGameState(@PathVariable Long gameId, Principal principal) {
         Game game = gameService.loadGameEntity(gameId);
-        GameStateDTO gameStateDTO = gameService.convertToGameStateDTO(game);
-        return ResponseEntity.ok(gameStateDTO);
-    }
+        StateDTO stateDTO = gameService.convertToStateDTO(game);
 
-    @GetMapping("/gameResult/{playerName}/{gameId}")
-    public String gameResult(@PathVariable String playerName,
-                             @PathVariable Long gameId, Model model) {
-        GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-        model.addAttribute("gameStateDTO", gameStateDTO);
-        return "gameResult";
-    }
+        String login = principal.getName();
+        String myNick = login.equals(game.getPlayer1Login())
+                ? game.getPlayer1Name()
+                : game.getPlayer2Name();
 
+        boolean yourTurn = stateDTO.getCurrentPlayer().equals(myNick);
+        return new MoveResponseDTO(stateDTO, yourTurn);
+    }
 
     @PostMapping("/load")
     public String loadGame(@RequestParam Long gameId, Model model) {

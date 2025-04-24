@@ -105,3 +105,22 @@ td button:hover:not(:disabled) {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.turn-message {
+    color: #666;
+    font-style: italic;
+    margin-top: 8px;
+}
+#your-turn {
+    color: green;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+
+

@@ -25,6 +25,12 @@ public class Game {
     @Column(name = "player2_name")
     private String player2Name;
 
+    @Column(name = "player1_login")
+    private String player1Login;
+
+    @Column(name = "player2_login")
+    private String player2Login;
+
     @Column(name = "current_player", nullable = false)
     private String currentPlayer;
 
@@ -45,10 +51,12 @@ public class Game {
     }
 
     public Game(String boardState, String player1Name, Character player1Symbol, String player2Name,
-                Character player2Symbol, String currentPlayer, boolean gameOver) {
+                Character player2Symbol, String player1Login, String player2Login, String currentPlayer, boolean gameOver) {
         this.boardState = boardState;
         this.player1Name = player1Name;
         this.player2Name = player2Name;
+        this.player1Login = player1Login;
+        this.player2Login = player2Login;
         this.currentPlayer = currentPlayer;
         this.gameOver = gameOver;
         this.player1Symbol = player1Symbol;
@@ -58,6 +66,12 @@ public class Game {
     }
 
     public Game(long id, String player1, String player2, int size) {
+    }
+
+    public Game(String s, String player1, char x, String player2, char o, boolean b) {
+    }
+
+    public Game(String boardStateJson, String name, char symbol, String name1, char symbol1, String player1Login, String name2, boolean b) {
     }
 
     public Long getId() {
@@ -95,6 +109,7 @@ public class Game {
     public String getCurrentPlayer() {
         return currentPlayer;
     }
+
     public void setCurrentPlayer(String currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
@@ -120,7 +135,6 @@ public class Game {
 
     }
 
-
     public Character getPlayer1Symbol() {
         return player1Symbol;
     }
@@ -136,9 +150,11 @@ public class Game {
     public void setPlayer2Symbol(Character player2Symbol) {
         this.player2Symbol = player2Symbol;
     }
-        public ZonedDateTime getCreatedDate() {
+
+    public ZonedDateTime getCreatedDate() {
         return createdDate;
     }
+
     public void setCreatedDate(ZonedDateTime createdDate) {
         this.createdDate = createdDate;
     }
@@ -146,6 +162,22 @@ public class Game {
     public void updateFromStateDTO(StateDTO stateDTO) {
         this.currentPlayer = stateDTO.getCurrentPlayer();
         this.gameOver = stateDTO.isGameOver();
+    }
+
+    public String getPlayer1Login() {
+        return player1Login;
+    }
+
+    public void setPlayer1Login(String player1Login) {
+        this.player1Login = player1Login;
+    }
+
+    public String getPlayer2Login() {
+        return player2Login;
+    }
+
+    public void setPlayer2Login(String player2Login) {
+        this.player2Login = player2Login;
     }
 }
 

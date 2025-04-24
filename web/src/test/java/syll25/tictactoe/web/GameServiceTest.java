@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
+import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 import syll25.tictactoe.web.service.GameService;
 
@@ -23,7 +24,6 @@ public class GameServiceTest {
 
     @InjectMocks
     private GameService gameService;
-
     @Mock
     private GameRepository gameRepository;
     private Game mockGame;
@@ -49,7 +49,7 @@ public class GameServiceTest {
            saveGame.setId(50L);
            return saveGame;
         });
-        Long gameId = gameService.startNewGame("Player1",3);
+        Long gameId = gameService.startNewGame("Player1","Player2",3, "login1");
         assertEquals(50L, gameId);
 
         verify(gameRepository).save(any(Game.class));
@@ -88,5 +88,36 @@ public class GameServiceTest {
             gameService.makeMove(1L, 0, 0, secondPlayer);
         });
     }
+    @Test
+    void loadGameEntityTest() {
+        when(gameRepository.findById(1L)).thenReturn(Optional.of(mockGame));
 
+        Game loadedGame = gameService.loadGameEntity(1L) ;
+
+        assertNotNull(loadedGame);
+        assertEquals("Player1", loadedGame.getPlayer1Name());
+    }
+    @Test
+    void convertToGameStateDTOTest() {
+        Game game = mockGame;
+        GameStateDTO gameStateDTO = gameService.convertToGameStateDTO(game);
+
+        assertNotNull(gameStateDTO);
+        assertEquals("Player1", gameStateDTO.getStateDTO().getPlayer1().name());
+        assertEquals("Player2", gameStateDTO.getStateDTO().getPlayer2().name());
+    }
+    @Test
+    void isYourTurnTest() {
+        mockGame.setPlayer1Login("Login1");
+        mockGame.setPlayer1Name("Sylwia");
+        mockGame.setPlayer2Login("Login2");
+        mockGame.setPlayer2Name("Sabina");
+        mockGame.setCurrentPlayer("Sylwia");
+
+        boolean result1 = gameService.isYourTurn(mockGame,"Login1");
+        assertTrue(result1);
+
+        boolean result2 = gameService.isYourTurn(mockGame, "Login2");
+        assertFalse(result2);
+    }
 }

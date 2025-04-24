@@ -1,0 +1,3 @@
+-- ALTER TABLE game_states
+-- ALTER COLUMN player1_login SET NOT NULL,
+-- ALTER COLUMN player2_login SET NOT NULL;

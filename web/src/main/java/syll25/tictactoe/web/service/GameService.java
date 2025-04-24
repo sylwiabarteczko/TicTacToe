@@ -14,6 +14,7 @@ import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
+
 import java.util.List;
 
 @Service
@@ -41,13 +42,13 @@ public class GameService {
     }
 
     @Transactional
-    public Long startNewGame(String player1Name, int boardSize) {
+    public Long startNewGame(String player1Name, String player2Name, int boardSize, String player1Login) {
 
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
         Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
-        Player player2 = new Player("Player", symbolChoice.drawSymbol());
+        Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
         Player currentPlayer = player1;
 
         String[][] emptyBoard = new String[boardSize][boardSize];
@@ -56,9 +57,9 @@ public class GameService {
         String boardStateJson = stateToJson(stateDTO);
 
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(),
-                player2.getSymbol(), currentPlayer.getName(), false);
+                player2.getSymbol(), player1Login, null, currentPlayer.getName(), false);
 
-        game.setCurrentPlayer(player1.getName());
+        game.setCurrentPlayer(currentPlayer.getName());
         gameRepository.save(game); //Id przydzielane
 
         return game.getId();
@@ -104,10 +105,10 @@ public class GameService {
 
             if (board.isWinner(currentPlayer.getSymbol()).isPresent()) {
                 stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer("GAME_OVER");
+                stateDTO.setCurrentPlayer("Game Over");
             } else if (board.isFull()) {
                 stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer("GAME_OVER");
+                stateDTO.setCurrentPlayer("Game Over");
             } else {
                 stateDTO.setCurrentPlayer(currentPlayer.getName().equals(player1.getName()) ? player2.getName() : player1.getName());
             }
@@ -126,7 +127,6 @@ public class GameService {
             game.setBoardState(stateToJson(stateDTO));
             game.setGameOver(stateDTO.isGameOver());
             game.setCurrentPlayer(stateDTO.getCurrentPlayer());
-
 
             gameRepository.save(game);
             return stateDTO;
@@ -223,6 +223,7 @@ public class GameService {
             throw new RuntimeException("Failed to deserialize board state", e);
         }
     }
+
     public GameStateDTO convertToGameStateDTO(Game game) {
         StateDTO stateDTO = convertToStateDTO(game);
         return new GameStateDTO(
@@ -232,6 +233,16 @@ public class GameService {
                 checkWinner(stateDTO)
         );
     }
+
+    public boolean isYourTurn(Game game, String currentLogin) {
+        if (currentLogin.equals(game.getPlayer1Login())) {
+            return game.getCurrentPlayer().equals(game.getPlayer1Name());
+        } else if (currentLogin.equals(game.getPlayer2Login())) {
+            return game.getCurrentPlayer().equals(game.getPlayer2Name());
+        }
+        return false;
+    }
+
 }
 
 

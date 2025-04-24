@@ -10,6 +10,7 @@ public class GameStateDTO {
     private boolean draw;
     private String currentPlayer;
     public int size;
+
     public boolean gameOver;
 
     public GameStateDTO(StateDTO stateDTO, Long gameId) {
