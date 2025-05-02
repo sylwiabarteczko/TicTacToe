@@ -43,8 +43,8 @@ public class GameController {
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
                                @RequestParam int boardSize,
-                               @RequestParam String player1Login) {
-        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, player1Login);
+                               Principal principal) {
+        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, principal.getName());
         return "redirect:/game/" + gameId;
     }
 
@@ -55,13 +55,8 @@ public class GameController {
         Game game = gameService.getGameById(gameId);
         String login = principal.getName();
 
-        if (game.getPlayer1Login() == null && login != null) {
-            game.setPlayer1Login(login);
-            gameService.save(game);
-        } else if (game.getPlayer2Login() == null && !login.equals(game.getPlayer1Login())) {
-            game.setPlayer2Login(login);
-            gameService.save(game);
-        } else if (!login.equals(game.getPlayer1Login()) && !login.equals(game.getPlayer2Login())) {
+        boolean presentPlayer = gameService.assignPlayer(game, login);
+        if (!presentPlayer) {
             model.addAttribute("error", "You are not a player in this game.");
             return "error";
         }
@@ -69,14 +64,9 @@ public class GameController {
         boolean isPlayer1 = login.equals(game.getPlayer1Login());
         boolean isPlayer2 = login.equals(game.getPlayer2Login());
 
-        if (!isPlayer1 && !isPlayer2) {
-            model.addAttribute("error", "You are not a player in this game.");
-            return "error";
-        }
-
         GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-        model.addAttribute("gameStateDTO", gameStateDTO);
 
+        model.addAttribute("gameStateDTO", gameStateDTO);
         model.addAttribute("isPlayer1", isPlayer1);
         model.addAttribute("isPlayer2", isPlayer2);
         model.addAttribute("player1Name", game.getPlayer1Name());

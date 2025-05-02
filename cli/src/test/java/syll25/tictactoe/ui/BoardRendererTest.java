@@ -23,11 +23,11 @@ public class BoardRendererTest {
         BoardRenderer.renderBoard(board);
 
         String expectedOutput = """
-        A B C\s
-        1 - - -\s
-        2 - - -\s
-        3 - - -\s
-        """;
+                A B C\s
+                1 - - -\s
+                2 - - -\s
+                3 - - -\s
+                """;
 
         assertEquals(expectedOutput.trim(), outputStream.toString().trim());
         System.setOut(System.out);
@@ -50,16 +50,64 @@ public class BoardRendererTest {
         BoardRenderer.renderBoard(board);
 
         String expectedOutput = """
-        A B C\s
-        1 - S -\s
-        2 - X -\s
-        3 - - -\s
-        """;
+                A B C\s
+                1 - S -\s
+                2 - X -\s
+                3 - - -\s
+                """;
 
         assertEquals(expectedOutput.trim(), outputStream.toString().trim());
         System.setOut(System.out);
 
     }
 
+    @Test
+    public void render1x1Board() {
+
+        Board board = new Board(1);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        BoardRenderer.renderBoard(board);
+
+        String exceptedOutput = """
+                A\s
+                1 -\s
+                """;
+        assertEquals(exceptedOutput.trim(), outputStream.toString().trim());
+        System.setOut(System.out);
+    }
+
+    @Test
+    public void render4x4Board() {
+
+        Board board = new Board(4);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        BoardRenderer.renderBoard(board);
+
+        String exceptedOutput = """
+                A B C D\s
+                1 - - - -\s
+                2 - - - -\s
+                3 - - - -\s
+                4 - - - -\s
+                """;
+
+        assertEquals(exceptedOutput.trim(), outputStream.toString().trim());
+        System.setOut(System.out);
+    }
+
+    @Test
+    public void renderBoardWithNull() {
+        try {
+            BoardRenderer.renderBoard(null);
+        } catch (NullPointerException e) {
+            return;
+        }
+    }
 }
 

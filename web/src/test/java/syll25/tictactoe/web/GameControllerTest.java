@@ -39,6 +39,7 @@ public class GameControllerTest {
         params.add("player1Name", "Sylwia");
         params.add("player2Name", "Sabina");
         params.add("boardSize", "3");
+        params.add("player1Login", "loginSylwia");
 
         ResponseEntity<String> response = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
         assertThat(response.getStatusCodeValue()).isEqualTo(302);
@@ -52,6 +53,7 @@ public class GameControllerTest {
         params.add("player1Name", "Sylwia");
         params.add("player2Name", "Sabina");
         params.add("boardSize", "3");
+        params.add("player1Login", "loginSylwia");
 
         ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
         assertThat(startGameResponse.getStatusCodeValue()).isEqualTo(302);
@@ -76,7 +78,8 @@ public class GameControllerTest {
         assertThat(moveResponse.getBody()).isNotNull();
 
         String responseBody = moveResponse.getBody();
-        assertThat(responseBody).contains("Tic Tac Toe");
+        assertThat(responseBody).contains("\"yourTurn\":false");
+        assertThat(responseBody).contains("\"currentPlayer\":\"Sabina\"");
         assertThat(responseBody).contains("Current Player");
         assertThat(responseBody).contains("disabled=\"disabled\"");
     }

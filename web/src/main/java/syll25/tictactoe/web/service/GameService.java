@@ -234,13 +234,23 @@ public class GameService {
         );
     }
 
-    public boolean isYourTurn(Game game, String currentLogin) {
-        if (currentLogin.equals(game.getPlayer1Login())) {
-            return game.getCurrentPlayer().equals(game.getPlayer1Name());
-        } else if (currentLogin.equals(game.getPlayer2Login())) {
-            return game.getCurrentPlayer().equals(game.getPlayer2Name());
+    public boolean assignPlayer(Game game, String login) {
+
+        boolean modified = false;
+
+        if (game.getPlayer1Login() == null && login != null) {
+            game.setPlayer1Login(login);
+            modified = true;
+        } else if (game.getPlayer2Login() == null && !login.equals(game.getPlayer1Login())) {
+            game.setPlayer2Login(login);
+            modified = true;
+        } else if (!login.equals(game.getPlayer1Login()) && !login.equals(game.getPlayer2Login())) {
+            return false;
         }
-        return false;
+        if (modified) {
+            gameRepository.save(game);
+        }
+        return true;
     }
 
 }

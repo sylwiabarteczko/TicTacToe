@@ -200,7 +200,7 @@ public class Main {
 
         Optional<Player> winner = board.isWinner(player.getSymbol());
         if (winner.isPresent()) {
-            System.out.println(player.getName() + player.getSymbol() + " wins!");
+            System.out.println(player.getName() + " wins!");
             return true;
         } else if (board.isFull()) {
             System.out.println("We have a draw!");

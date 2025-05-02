@@ -9,7 +9,6 @@ import syll25.tictactoe.logic.exception.OutOfRangeException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.assertj.core.api.Assertions.*;
 
 public class BoardTest {
 

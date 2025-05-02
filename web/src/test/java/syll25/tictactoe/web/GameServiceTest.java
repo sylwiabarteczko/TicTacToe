@@ -106,18 +106,5 @@ public class GameServiceTest {
         assertEquals("Player1", gameStateDTO.getStateDTO().getPlayer1().name());
         assertEquals("Player2", gameStateDTO.getStateDTO().getPlayer2().name());
     }
-    @Test
-    void isYourTurnTest() {
-        mockGame.setPlayer1Login("Login1");
-        mockGame.setPlayer1Name("Sylwia");
-        mockGame.setPlayer2Login("Login2");
-        mockGame.setPlayer2Name("Sabina");
-        mockGame.setCurrentPlayer("Sylwia");
 
-        boolean result1 = gameService.isYourTurn(mockGame,"Login1");
-        assertTrue(result1);
-
-        boolean result2 = gameService.isYourTurn(mockGame, "Login2");
-        assertFalse(result2);
-    }
 }

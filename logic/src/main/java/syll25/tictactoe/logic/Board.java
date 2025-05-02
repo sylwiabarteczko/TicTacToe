@@ -44,6 +44,7 @@ public class Board implements GameBoard {
         }
     }
 
+    @Override
     public int getSize() {
         return size;
     }
