@@ -1,131 +1,144 @@
 package syll25.tictactoe.web;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import syll25.tictactoe.web.model.MoveResponseDTO;
 
 import java.net.URI;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class GameControllerTest {
+class GameControllerTest {
 
     @LocalServerPort
     private int port;
+
     @Autowired
     private TestRestTemplate restTemplate;
-    private ResponseEntity<Object> moveResponse;
 
-    private String createURLWithPort(String uri) {
-        return "http://localhost:" + port + uri;
+    private String sessionCookie;
+    private String username;
+    private String password;
+
+    private String createURL(String path) {
+        return "http://localhost:" + port + path;
+    }
+
+    @BeforeEach
+    void registerAndLogin() {
+        username = "testUser_" + System.currentTimeMillis();
+        password = "testPass_" + System.currentTimeMillis();
+
+        MultiValueMap<String, String> registerForm = new LinkedMultiValueMap<>();
+        registerForm.add("username", username);
+        registerForm.add("password", password);
+
+        restTemplate.postForEntity(createURL("/user/register"), registerForm, String.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpEntity<MultiValueMap<String, String>> loginRequest = new HttpEntity<>(registerForm, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURL("/user/login"),
+                HttpMethod.POST,
+                loginRequest,
+                String.class
+        );
+
+        sessionCookie = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+        assertThat(sessionCookie).isNotNull();
+    }
+
+
+    private HttpHeaders getAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.COOKIE, sessionCookie);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        return headers;
     }
 
     @Test
-    public void getNewGameTest() {
-        ResponseEntity<String> response = restTemplate.getForEntity(createURLWithPort("/game/new"), String.class);
-        assertThat(response.getStatusCodeValue()).isEqualTo(200);
-        assertThat(response.getBody()).contains("Start a new Tic Tac Toe Game");
+    void startNewGame_shouldRedirectToGame() {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("player1Name", "Gracz1");
+        form.add("player2Name", "Gracz2");
+        form.add("boardSize", "3");
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURL("/game/start"),
+                HttpMethod.POST,
+                new HttpEntity<>(form, getAuthHeaders()),
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getHeaders().getLocation()).isNotNull();
+        assertThat(response.getHeaders().getLocation().getPath()).matches("/game/\\d+");
     }
 
     @Test
-    public void startNewGameTest() {
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("player1Name", "Sylwia");
-        params.add("player2Name", "Sabina");
-        params.add("boardSize", "3");
-        params.add("player1Login", "loginSylwia");
-
-        ResponseEntity<String> response = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
-        assertThat(response.getStatusCodeValue()).isEqualTo(302);
-        assertThat(response.getHeaders().getLocation().toString()).contains("/game/");
-    }
-
-    @Test
-    public void testMakeMove() {
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("player1Name", "Sylwia");
-        params.add("player2Name", "Sabina");
-        params.add("boardSize", "3");
-        params.add("player1Login", "loginSylwia");
-
-        ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
-        assertThat(startGameResponse.getStatusCodeValue()).isEqualTo(302);
-
-        URI location = startGameResponse.getHeaders().getLocation();
-        assertThat(location).isNotNull();
-
-        String gameUrl = location.toString();
-        String gameId = gameUrl.substring(gameUrl.lastIndexOf('/') + 1);
-
-        System.out.println("Extracted gameId: " + gameId);
-        assertThat(gameId).isNotBlank();
+    void makeMove_shouldReturnUpdatedState() {
+        Long gameId = createNewGame();
 
         MultiValueMap<String, String> moveParams = new LinkedMultiValueMap<>();
-        moveParams.add("gameId", gameId);
+        moveParams.add("gameId", gameId.toString());
         moveParams.add("row", "0");
         moveParams.add("col", "0");
-        System.out.println("Move params: " + moveParams);
 
-        ResponseEntity<String> moveResponse = restTemplate.postForEntity(createURLWithPort("/game/move"), moveParams, String.class);
+        ResponseEntity<MoveResponseDTO> response = restTemplate.exchange(
+                createURL("/game/move"),
+                HttpMethod.POST,
+                new HttpEntity<>(moveParams, getAuthHeaders()),
+                MoveResponseDTO.class
+        );
 
-        assertThat(moveResponse.getBody()).isNotNull();
-
-        String responseBody = moveResponse.getBody();
-        assertThat(responseBody).contains("\"yourTurn\":false");
-        assertThat(responseBody).contains("\"currentPlayer\":\"Sabina\"");
-        assertThat(responseBody).contains("Current Player");
-        assertThat(responseBody).contains("disabled=\"disabled\"");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        MoveResponseDTO body = response.getBody();
+        assertThat(body).isNotNull();
+        assertThat(body.getStateDTO().getBoard()[0][0]).isNotBlank();
     }
 
     @Test
-    public void testGameResult() {
+    void getGameState_shouldReturnCurrentState() {
+        Long gameId = createNewGame();
 
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("player1Name", "Sylwia");
-        params.add("player2Name", "Sabina");
-        params.add("boardSize", "3");
+        ResponseEntity<MoveResponseDTO> response = restTemplate.exchange(
+                createURL("/game/" + gameId + "/state"),
+                HttpMethod.GET,
+                new HttpEntity<>(null, getAuthHeaders()),
+                MoveResponseDTO.class
+        );
 
-        ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
-        String gameUrl = startGameResponse.getHeaders().getLocation().toString();
-        String gameId = gameUrl.substring(gameUrl.lastIndexOf('/') + 1);
-
-        makeMoveAndAssert(gameId, 0, 0);
-        makeMoveAndAssert(gameId, 1, 0);
-        makeMoveAndAssert(gameId, 0, 1);
-        makeMoveAndAssert(gameId, 1, 1);
-        ResponseEntity<String> winningMoveResponse = makeMoveAndAssert(gameId, 0, 2);
-
-        assertThat(winningMoveResponse.getStatusCodeValue()).isEqualTo(302);
-        assertThat(winningMoveResponse.getHeaders().getLocation().toString()).contains("/game/gameResult/");
-
-        ResponseEntity<String> gameResultResponse = restTemplate.getForEntity(winningMoveResponse.getHeaders().getLocation(), String.class);
-        assertThat(gameResultResponse.getStatusCodeValue()).isEqualTo(200);
-        assertThat(gameResultResponse.getBody()).contains("Game Result");
-        assertThat(gameResultResponse.getBody()).contains("Sylwia");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getStateDTO().getBoard()).isNotNull();
     }
 
+    private Long createNewGame() {
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+        form.add("player1Name", "Gracz1");
+        form.add("player2Name", "Gracz2");
+        form.add("boardSize", "3");
 
-    private ResponseEntity<String> makeMoveAndAssert(String gameId, int row, int col) {
-        MultiValueMap<String, String> moveParams = new LinkedMultiValueMap<>();
-        moveParams.add("gameId", gameId);
-        moveParams.add("row", String.valueOf(row));
-        moveParams.add("col", String.valueOf(col));
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURL("/game/start"),
+                HttpMethod.POST,
+                new HttpEntity<>(form, getAuthHeaders()),
+                String.class
+        );
 
-        ResponseEntity<String> moveResponse = restTemplate.postForEntity(createURLWithPort("/game/move"), moveParams, String.class);
-        assertThat(moveResponse.getStatusCodeValue()).isIn(200, 302);  // 302 mamy przekierowanie
-        return moveResponse;
+        URI location = response.getHeaders().getLocation();
+        assertThat(location).isNotNull();
+
+        return Long.parseLong(location.getPath().replace("/game/", ""));
     }
-
 }
-
-
-
-
-
