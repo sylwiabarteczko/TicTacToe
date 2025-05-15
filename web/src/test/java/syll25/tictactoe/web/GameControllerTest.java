@@ -12,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 
 import java.net.URI;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,10 +21,8 @@ class GameControllerTest {
 
     @LocalServerPort
     private int port;
-
     @Autowired
     private TestRestTemplate restTemplate;
-
     private String sessionCookie;
     private String username;
     private String password;
@@ -54,10 +53,19 @@ class GameControllerTest {
                 String.class
         );
 
-        sessionCookie = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
-        assertThat(sessionCookie).isNotNull();
-    }
+        List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
+        assertThat(cookies).isNotEmpty();
 
+        for (String cookie : cookies) {
+            if (cookie.startsWith("JSESSIONID")) {
+                sessionCookie = cookie.split(";", 2)[0];
+                break;
+            }
+        }
+
+        assertThat(sessionCookie).isNotNull();
+        System.out.println("Session cookie: " + sessionCookie);
+    }
 
     private HttpHeaders getAuthHeaders() {
         HttpHeaders headers = new HttpHeaders();
