@@ -12,7 +12,6 @@ import org.springframework.util.MultiValueMap;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,8 +20,10 @@ class GameControllerTest {
 
     @LocalServerPort
     private int port;
+
     @Autowired
     private TestRestTemplate restTemplate;
+
     private String sessionCookie;
     private String username;
     private String password;
@@ -72,9 +73,16 @@ class GameControllerTest {
         form.add("player2Name", "Gracz2");
         form.add("boardSize", "3");
 
-        ResponseEntity<String> response = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
-        assertThat(response.getStatusCodeValue()).isEqualTo(302);
-        assertThat(response.getHeaders().getLocation().toString()).contains("/game/");
+        ResponseEntity<String> response = restTemplate.exchange(
+                createURL("/game/start"),
+                HttpMethod.POST,
+                new HttpEntity<>(form, getAuthHeaders()),
+                String.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FOUND);
+        assertThat(response.getHeaders().getLocation()).isNotNull();
+        assertThat(response.getHeaders().getLocation().getPath()).matches("/game/\\d+");
     }
 
     @Test
@@ -103,9 +111,12 @@ class GameControllerTest {
     void getGameState_shouldReturnCurrentState() {
         Long gameId = createNewGame();
 
-        ResponseEntity<String> startGameResponse = restTemplate.postForEntity(createURLWithPort("/game/start"), params, String.class);
-        String gameUrl = startGameResponse.getHeaders().getLocation().toString();
-        String gameId = gameUrl.substring(gameUrl.lastIndexOf('/') + 1);
+        ResponseEntity<MoveResponseDTO> response = restTemplate.exchange(
+                createURL("/game/" + gameId + "/state"),
+                HttpMethod.GET,
+                new HttpEntity<>(null, getAuthHeaders()),
+                MoveResponseDTO.class
+        );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -131,8 +142,3 @@ class GameControllerTest {
         return Long.parseLong(location.getPath().replace("/game/", ""));
     }
 }
-
-
-
-
-

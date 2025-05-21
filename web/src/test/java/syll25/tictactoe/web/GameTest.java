@@ -10,9 +10,12 @@ public class GameTest {
 
     @Test
     void testGameCreation() {
-        Game game = new Game("---\n---\n---", "Player1", 'X', "Player2", 'O', null, null, "Player1", false);
+        Game game = new Game("---\n---\n---", "Player1", 'X', "Player2", 'O',
+                "player1Login", "player2Login", "Player1", false);
+
         assertEquals("Player1", game.getCurrentPlayer());
         assertFalse(game.isGameOver());
     }
+
 
 }

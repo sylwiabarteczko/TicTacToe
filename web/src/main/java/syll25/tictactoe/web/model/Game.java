@@ -135,11 +135,9 @@ public class Game {
 
     }
 
-
     public Character getPlayer1Symbol() {
         return player1Symbol;
     }
-
 
     public Character getPlayer2Symbol() {
         return player2Symbol;
@@ -182,4 +180,3 @@ public class Game {
         this.player2Login = player2Login;
     }
 }
-

@@ -10,11 +10,11 @@ import syll25.tictactoe.logic.Board;
 import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
-import syll25.tictactoe.logic.exception.InvalidMoveException;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
+
 import java.util.List;
 
 @Service
@@ -42,9 +42,10 @@ public class GameService {
     }
 
     @Transactional
-    public Long startNewGame(String player1Name, int boardSize) {
+    public Long startNewGame(String player1Name, String player2Name, int boardSize, String player1Login) {
 
         Board board = new Board(boardSize);
+
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');
         Player player1 = new Player(player1Name, symbolChoice.drawSymbol());
         Player player2 = new Player(player2Name, symbolChoice.drawSymbol());
@@ -56,10 +57,10 @@ public class GameService {
         String boardStateJson = stateToJson(stateDTO);
 
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(),
-                player2.getSymbol(), currentPlayer.getName(), false);
+                player2.getSymbol(), player1Login, null, currentPlayer.getName(), false);
 
         game.setCurrentPlayer(currentPlayer.getName());
-        gameRepository.save(game); //Id przydzielane
+        gameRepository.save(game);
 
         return game.getId();
     }
@@ -67,7 +68,7 @@ public class GameService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public StateDTO makeMove(Long gameId, int row, int col, String currentUsername) {
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new InvalidMoveException("Game not found")); //todo obsluga bledow
+                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
 
         if (!currentUsername.equals(game.getPlayer1Name()) &&
                 !currentUsername.equals(game.getPlayer2Name())) {
@@ -133,7 +134,6 @@ public class GameService {
         } catch (CellOccupiedException e) {
             throw new CellOccupiedException();
         }
-        return board;
     }
 
 
@@ -144,8 +144,8 @@ public class GameService {
         return new GameStateDTO(jsonToState(game.getBoardState()), gameId);
     }
 
-    public List<Game> listGames() {
-        return gameRepository.findAll();
+    public List<Game> listActiveGames() {
+        return gameRepository.findByActiveGame();
     }
 
     private Board loadBoardFromString(Long gameId) {
@@ -254,7 +254,6 @@ public class GameService {
     }
 
 }
-
 
 
 

@@ -29,11 +29,11 @@ public class UserService implements UserDetailsService {
 
         User user = userRepository.findByUsername(username);
 
-      return org.springframework.security.core.userdetails.User
-              .withUsername(user.getUsername())
-              .password(user.getPassword())
-              .roles("USER")
-              .build();
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles("USER")
+                .build();
     }
 
 }

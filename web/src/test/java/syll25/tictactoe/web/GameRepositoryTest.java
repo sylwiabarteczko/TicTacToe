@@ -70,4 +70,3 @@ public class GameRepositoryTest {
         assertThat(foundGame.get().getBoardState()).isEqualTo("XOX,O,O");
     }
 }
-

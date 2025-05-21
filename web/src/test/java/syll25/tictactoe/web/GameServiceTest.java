@@ -45,9 +45,9 @@ public class GameServiceTest {
     @Test
     void startNewGameTest() {
         when(gameRepository.save(any(Game.class))).thenAnswer(invocation -> {
-           Game saveGame = invocation.getArgument(0);
-           saveGame.setId(50L);
-           return saveGame;
+            Game saveGame = invocation.getArgument(0);
+            saveGame.setId(50L);
+            return saveGame;
         });
         Long gameId = gameService.startNewGame("Player1","Player2",3, "login1");
         assertEquals(50L, gameId);

@@ -42,4 +42,3 @@ public class XmlState implements State{
     }
 
 }
-

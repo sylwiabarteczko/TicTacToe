@@ -1,3 +1,0 @@
--- spacja na końcu rozszerzenia nazwy pliku
-
-ALTER TABLE game ALTER COLUMN player1Symbol SET NOT NULL;

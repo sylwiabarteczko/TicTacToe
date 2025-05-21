@@ -43,8 +43,8 @@ public class GameController {
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
                                @RequestParam int boardSize,
-                               @RequestParam String player1Login) {
-        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, player1Login);
+                               Principal principal) {
+        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, principal.getName());
         return "redirect:/game/" + gameId;
     }
 
@@ -106,12 +106,13 @@ public class GameController {
         Game game = gameService.loadGameEntity(gameId);
         StateDTO stateDTO = gameService.convertToStateDTO(game);
 
-    @GetMapping("/gameResult/{playerName}/{gameId}")
-    public String gameResult(@PathVariable String playerName,
-                             @PathVariable Long gameId, Model model) {
-        GameStateDTO gameStateDTO = gameService.loadGame(gameId);
-        model.addAttribute("gameStateDTO", gameStateDTO);
-        return "gameResult";
+        String login = principal.getName();
+        String myNick = login.equals(game.getPlayer1Login())
+                ? game.getPlayer1Name()
+                : game.getPlayer2Name();
+
+        boolean yourTurn = stateDTO.getCurrentPlayer().equals(myNick);
+        return new MoveResponseDTO(stateDTO, yourTurn);
     }
 
     @PostMapping("/load")
@@ -124,4 +125,3 @@ public class GameController {
 
 
 }
-

@@ -23,11 +23,11 @@ public class BoardRendererTest {
         BoardRenderer.renderBoard(board);
 
         String expectedOutput = """
-        A B C\s
-        1 - - -\s
-        2 - - -\s
-        3 - - -\s
-        """;
+                A B C\s
+                1 - - -\s
+                2 - - -\s
+                3 - - -\s
+                """;
 
         assertEquals(expectedOutput.trim(), outputStream.toString().trim());
         System.setOut(System.out);
@@ -50,11 +50,11 @@ public class BoardRendererTest {
         BoardRenderer.renderBoard(board);
 
         String expectedOutput = """
-        A B C\s
-        1 - S -\s
-        2 - X -\s
-        3 - - -\s
-        """;
+                A B C\s
+                1 - S -\s
+                2 - X -\s
+                3 - - -\s
+                """;
 
         assertEquals(expectedOutput.trim(), outputStream.toString().trim());
         System.setOut(System.out);
@@ -110,4 +110,3 @@ public class BoardRendererTest {
         }
     }
 }
-
