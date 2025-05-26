@@ -38,13 +38,14 @@ function updateGameState(response) {
     }
 
     getSafeElement("current-player").textContent = currentPlayer;
+
     getSafeElement("your-turn").style.display = yourTurn ? "block" : "none";
     getSafeElement("wait-turn").style.display = yourTurn ? "none" : "block";
 
     if (gameOver) {
-        getSafeElement("game-active").style.display = "none";
-        getSafeElement("game-over-message").style.display = "block";
-
+        getSafeElement("your-turn").style.display = "none";
+        getSafeElement("new-game-button").style.display = "block";
+        getSafeElement("wait-turn").style.display = "none";
         getSafeElement("winner-message").textContent =
             currentPlayer === "GAME_OVER"
                 ? "It's a draw!"

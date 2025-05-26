@@ -10,16 +10,20 @@
 <h1>Tic Tac Toe</h1>
 
 <div>
-    <div th:if="${gameStateDTO.gameOver}" class="game-over-message">
+    <div th:if="${gameStateDTO.gameOver}" id="game-over-message">
         <p th:if="${gameStateDTO.winnerFound}" th:text="${gameStateDTO.currentPlayer + ' wins!'}"></p>
         <p th:if="${!gameStateDTO.winnerFound}">It's a draw!</p>
         <a th:href="@{/game/new}" class="button">Start a new game</a>
+    </div>
+    <div>
+        <p id="winner-message"></p>
     </div>
 
     <div th:if="${!gameStateDTO.gameOver}">
         <p>Current Player: <strong id="current-player" th:text="${gameStateDTO.currentPlayer}"></strong></p>
 
         <p id="your-turn" style="color:green; display:none;">It's your turn!</p>
+        <a id="new-game-button" th:href="@{/game/new}" style="display:none;" class="button">Start a new game</a>
         <p id="wait-turn" class="turn-message" style="display:none;">Please wait for your turn.</p>
 
         <div class="game-board">

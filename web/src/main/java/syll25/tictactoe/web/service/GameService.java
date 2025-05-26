@@ -105,10 +105,10 @@ public class GameService {
 
             if (board.isWinner(currentPlayer.getSymbol()).isPresent()) {
                 stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer("Game Over");
+                stateDTO.setCurrentPlayer(currentPlayer.getName());
             } else if (board.isFull()) {
                 stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer("Game Over");
+                stateDTO.setCurrentPlayer(currentPlayer.getName());
             } else {
                 stateDTO.setCurrentPlayer(currentPlayer.getName().equals(player1.getName()) ? player2.getName() : player1.getName());
             }
