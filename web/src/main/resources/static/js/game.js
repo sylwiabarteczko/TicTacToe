@@ -22,7 +22,7 @@ function updateGameState(response) {
             const button = document.createElement("button");
 
             button.textContent = board[row][col] || "";
-            button.disabled = board[row][col] !== null || !yourTurn;
+            button.disabled = board[row][col] !== null || !yourTurn || gameOver;
 
             button.dataset.row = row;
             button.dataset.col = col;
