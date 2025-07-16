@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Choose Game Player</title>
+    <link th:href="@{/css/game.css}" rel="stylesheet">
+</head>
+<body>
+<h1>Choose Game Mode</h1>
+
+<div>
+    <form th:action="@{/game/new}" method="get">
+        <input type="hidden" name="mode" value="HUMAN">
+        <button type="submit">Play with another player</button>
+    </form>
+
+    <form th:action="@{/game/new}" method="get">
+        <input type="hidden" name="mode" value="AI">
+        <button type="submit">Play with AI</button>
+    </form>
+</div>
+
+<a href="/game/list-games">Back to Game List</a>
+</body>
+</html>

@@ -35,7 +35,11 @@ public class GameController {
     }
 
     @GetMapping("/new")
-    public String newGameForm() {
+    public String newGameForm(@RequestParam(name = "mode", required = false) String mode, Model model) {
+        if (mode == null) {
+            return "choosePlayer";
+        }
+        model.addAttribute("mode", mode);
         return "newGame";
     }
 
@@ -43,7 +47,11 @@ public class GameController {
     public String startNewGame(@RequestParam String player1Name,
                                @RequestParam String player2Name,
                                @RequestParam int boardSize,
+                               @RequestParam String mode,
                                Principal principal) {
+        if ("AI".equals(mode)) {
+            player2Name = "Player";
+        }
         Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, principal.getName());
         return "redirect:/game/" + gameId;
     }

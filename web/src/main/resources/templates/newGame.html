@@ -12,8 +12,13 @@
         <label for="player1Name">Player 1 Name:</label>
         <input type="text" id="player1Name" name="player1Name" required>
 
-        <label for="player2Name">Player 2 Name:</label>
-        <input type="text" id="player2Name" name="player2Name" required>
+        <div th:if="${mode == 'HUMAN'}">
+            <label for="player2Name">Player 2 Name:</label>
+            <input type="text" id="player2Name" name="player2Name" required>
+        </div>
+
+        <input type="hidden" name="mode" th:value="${mode}"/>
+        <input type="hidden" name="player2Name" th:if="${mode == 'AI'}" value="Player"/>
 
         <label for="boardSize">Board Size:</label>
         <input type="number" id="boardSize" name="boardSize" min="3" max="10" value="3" required>

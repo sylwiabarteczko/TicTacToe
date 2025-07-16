@@ -20,7 +20,7 @@
     <tr th:each="game : ${games}">
         <td th:text="${game.id}"></td>
         <td th:text="${game.player1Name}"></td>
-        <td th:text="${game.player2Name}"></td>
+        <td th:text="${game.player2Name == 'Player' ? 'AI' : game.player2Name}"></td>
         <td>
             <a th:href="@{/game/{gameId}(gameId=${game.id})}">View game</a>
         </td>
@@ -28,7 +28,17 @@
     </tbody>
 </table>
 
-<a href="/game/new" class="button">Start new game</a>
+<div style="margin-top: 30px;">
+    <form th:action="@{/game/new}" method="get" style="display: inline;">
+        <input type="hidden" name="mode" value="HUMAN"/>
+        <button type="submit" class="button">💁🏼 New Game vs Player</button>
+    </form>
+
+    <form th:action="@{/game/new}" method="get" style="display: inline; margin-left: 10px;">
+        <input type="hidden" name="mode" value="AI"/>
+        <button type="submit" class="button">🤖 New Game vs AI</button>
+    </form>
+</div>
 
 </body>
 </html>

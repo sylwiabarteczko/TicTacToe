@@ -15,7 +15,9 @@ import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class GameService {
@@ -128,11 +130,53 @@ public class GameService {
             game.setGameOver(stateDTO.isGameOver());
             game.setCurrentPlayer(stateDTO.getCurrentPlayer());
 
+            if (!stateDTO.isGameOver()
+                    && game.getPlayer2Name().equals("Player")
+                    && stateDTO.getCurrentPlayer().equals("Player")) {
+
+                performAiMove(board, player2, stateDTO, game);
+            }
             gameRepository.save(game);
             return stateDTO;
 
         } catch (CellOccupiedException e) {
             throw new CellOccupiedException();
+        }
+    }
+
+    private void performAiMove(Board board, Player aiPlayer, StateDTO stateDTO, Game game) {
+        for (int i = 0; i < board.getSize(); i++) {
+            for (int j = 0; j < board.getSize(); j++) {
+                if (board.isCellEmpty(i, j)) {
+                    board.placeSymbol(aiPlayer, i, j);
+
+                    if (board.isWinner(aiPlayer.getSymbol()).isPresent()) {
+                        stateDTO.setGameOver(true);
+                        stateDTO.setCurrentPlayer(aiPlayer.getName());
+                    } else if (board.isFull()) {
+                        stateDTO.setGameOver(true);
+                        stateDTO.setCurrentPlayer(aiPlayer.getName());
+                    } else {
+                        stateDTO.setCurrentPlayer(game.getPlayer1Name());
+                    }
+
+                    String[][] updatedBoard = new String[board.getSize()][board.getSize()];
+                    Player[][] cells = board.getCells();
+                    for (int x = 0; x < cells.length; x++) {
+                        for (int y = 0; y < cells[x].length; y++) {
+                            if (cells[x][y] != null) {
+                                updatedBoard[x][y] = String.valueOf(cells[x][y].getSymbol());
+                            }
+                        }
+                    }
+
+                    stateDTO.setBoard(updatedBoard);
+                    game.setBoardState(stateToJson(stateDTO));
+                    game.setGameOver(stateDTO.isGameOver());
+                    game.setCurrentPlayer(stateDTO.getCurrentPlayer());
+                    return;
+                }
+            }
         }
     }
 
@@ -146,34 +190,6 @@ public class GameService {
 
     public List<Game> listActiveGames() {
         return gameRepository.findByActiveGame();
-    }
-
-    private Board loadBoardFromString(Long gameId) {
-
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new IllegalArgumentException("Game not found"));
-
-        Character player1Symbol = game.getPlayer1Symbol();
-        Character player2Symbol = game.getPlayer2Symbol();
-        String boardState = game.getBoardState();
-
-        Board board = new Board(game.getBoardState().split("\n").length);
-
-        Player player1 = new Player(game.getPlayer1Name(), game.getPlayer1Symbol());
-        Player player2 = new Player(game.getPlayer2Name(), game.getPlayer2Symbol());
-
-        String[] rows = game.getBoardState().split("\n");
-        for (int row = 0; row < rows.length; row++) {
-            String[] cells = rows[row].split(" ");
-            for (int col = 0; col < cells.length; col++) {
-                if (cells[col].equals(String.valueOf(player1.getSymbol()))) {
-                    board.placeSymbol(player1, row, col);
-                } else if (cells[col].equals(String.valueOf(player2.getSymbol()))) {
-                    board.placeSymbol(player2, row, col);
-                }
-            }
-        }
-        return board;
     }
 
     public Game getGameById(Long gameId) {
@@ -253,6 +269,22 @@ public class GameService {
         return true;
     }
 
+    private void makeAutoMove(StateDTO stateDTO, Board board, Player player2) {
+
+        List<int[]> emptyCells = new ArrayList<>();
+
+        for (int i = 0; i <board.getSize(); i++) {
+            for (int j = 0; j < board.getSize(); j++) {
+                if (board.isCellEmpty(i, j)) {
+                    emptyCells.add(new int[] {i, j});
+                }
+            }
+        }
+        if (!emptyCells.isEmpty()) {
+            int[] move = emptyCells.get(new Random().nextInt(emptyCells.size()));
+            board.placeSymbol(player2, move[0], move[1]);
+        }
+    }
 }
 
 
