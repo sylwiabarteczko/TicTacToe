@@ -273,10 +273,10 @@ public class GameService {
 
         List<int[]> emptyCells = new ArrayList<>();
 
-        for (int i = 0; i <board.getSize(); i++) {
+        for (int i = 0; i < board.getSize(); i++) {
             for (int j = 0; j < board.getSize(); j++) {
                 if (board.isCellEmpty(i, j)) {
-                    emptyCells.add(new int[] {i, j});
+                    emptyCells.add(new int[]{i, j});
                 }
             }
         }
