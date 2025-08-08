@@ -1,6 +1,7 @@
 package syll25.tictactoe.web.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -131,5 +132,9 @@ public class GameController {
         return "game";
     }
 
-
+    @GetMapping("/api/game/{id}/best-move")
+    public ResponseEntity<MoveResponseDTO> getBestMove(@PathVariable Long id, Principal principal) {
+        MoveResponseDTO move = gameService.getBestMoveForAI(id, principal.getName());
+        return ResponseEntity.ok(move);
+    }
 }

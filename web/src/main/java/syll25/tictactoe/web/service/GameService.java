@@ -13,6 +13,7 @@ import syll25.tictactoe.logic.exception.CellOccupiedException;
 import syll25.tictactoe.logic.state.StateDTO;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
+import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 
 import java.util.ArrayList;
@@ -24,6 +25,12 @@ public class GameService {
 
     @Autowired
     private GameRepository gameRepository;
+
+    private OpenRouterClient openRouterClient;
+
+    public void setOpenRouterClient(OpenRouterClient openRouterClient) {
+        this.openRouterClient = openRouterClient;
+    }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -145,41 +152,41 @@ public class GameService {
     }
 
     private void performAiMove(Board board, Player aiPlayer, StateDTO stateDTO, Game game) {
-        for (int i = 0; i < board.getSize(); i++) {
-            for (int j = 0; j < board.getSize(); j++) {
-                if (board.isCellEmpty(i, j)) {
-                    board.placeSymbol(aiPlayer, i, j);
+        try {
+            int[] move = openRouterClient.getBestMove(stateDTO.getBoard(), aiPlayer.getSymbol(), game.getPlayer1Symbol());
 
-                    if (board.isWinner(aiPlayer.getSymbol()).isPresent()) {
-                        stateDTO.setGameOver(true);
-                        stateDTO.setCurrentPlayer(aiPlayer.getName());
-                    } else if (board.isFull()) {
-                        stateDTO.setGameOver(true);
-                        stateDTO.setCurrentPlayer(aiPlayer.getName());
-                    } else {
-                        stateDTO.setCurrentPlayer(game.getPlayer1Name());
+            board.placeSymbol(aiPlayer, move[0], move[1]);
+
+            if (board.isWinner(aiPlayer.getSymbol()).isPresent()) {
+                stateDTO.setGameOver(true);
+                stateDTO.setCurrentPlayer(aiPlayer.getName());
+            } else if (board.isFull()) {
+                stateDTO.setGameOver(true);
+                stateDTO.setCurrentPlayer(aiPlayer.getName());
+            } else {
+                stateDTO.setCurrentPlayer(game.getPlayer1Name());
+            }
+
+            String[][] updatedBoard = new String[board.getSize()][board.getSize()];
+            Player[][] cells = board.getCells();
+            for (int x = 0; x < cells.length; x++) {
+                for (int y = 0; y < cells[x].length; y++) {
+                    if (cells[x][y] != null) {
+                        updatedBoard[x][y] = String.valueOf(cells[x][y].getSymbol());
                     }
-
-                    String[][] updatedBoard = new String[board.getSize()][board.getSize()];
-                    Player[][] cells = board.getCells();
-                    for (int x = 0; x < cells.length; x++) {
-                        for (int y = 0; y < cells[x].length; y++) {
-                            if (cells[x][y] != null) {
-                                updatedBoard[x][y] = String.valueOf(cells[x][y].getSymbol());
-                            }
-                        }
-                    }
-
-                    stateDTO.setBoard(updatedBoard);
-                    game.setBoardState(stateToJson(stateDTO));
-                    game.setGameOver(stateDTO.isGameOver());
-                    game.setCurrentPlayer(stateDTO.getCurrentPlayer());
-                    return;
                 }
             }
+
+            stateDTO.setBoard(updatedBoard);
+            game.setBoardState(stateToJson(stateDTO));
+            game.setGameOver(stateDTO.isGameOver());
+            game.setCurrentPlayer(stateDTO.getCurrentPlayer());
+
+        } catch (Exception e) {
+            System.out.println("Failed");
+            makeAutoMove(stateDTO, board, aiPlayer);
         }
     }
-
 
     public GameStateDTO loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
@@ -285,6 +292,30 @@ public class GameService {
             board.placeSymbol(player2, move[0], move[1]);
         }
     }
+    public MoveResponseDTO getBestMoveForAI(Long gameId, String currentUsername) {
+        Game game = getGameById(gameId);
+
+        if (game.isGameOver()) {
+            throw new IllegalStateException("Game is already over.");
+        }
+
+        if (!currentUsername.equals(game.getPlayer2Login())) {
+            throw new IllegalStateException("Only the AI player can use this endpoint.");
+        }
+
+        StateDTO stateDTO = jsonToState(game.getBoardState());
+
+        String[][] board = stateDTO.getBoard();
+        char aiSymbol = game.getPlayer2Symbol();
+        char opponentSymbol = game.getPlayer1Symbol();
+
+        int[] move = openRouterClient.getBestMove(board, aiSymbol, opponentSymbol);
+
+        StateDTO updatedState = makeMove(gameId, move[0], move[1], currentUsername);
+        boolean yourTurn = updatedState.getCurrentPlayer().equals(currentUsername);
+        return new MoveResponseDTO(updatedState, yourTurn);
+    }
+
 }
 
 
