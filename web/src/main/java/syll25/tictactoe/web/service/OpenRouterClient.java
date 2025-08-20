@@ -38,40 +38,47 @@ public class OpenRouterClient {
         );
 
         Map<String, Object> body = Map.of(
-                "model", "mistral",
+                "model", "mistralai/mistral-7b-instruct",
                 "messages", List.of(message)
         );
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         ResponseEntity<Map> response = restTemplate.postForEntity(OPENROUTER_API_URL, request, Map.class);
 
-        String content = ((Map)((List)((Map) response.getBody().get("choices")).get(0)).get(Integer.parseInt("message"))).get("content").toString();
+        Map rBody = response.getBody();
+        ArrayList choices = (ArrayList) rBody.get("choices");
+        Map choice = (Map) choices.get(0);
+        LinkedHashMap messages = (LinkedHashMap) choice.get("message");
+
+        String content = (String) messages.get("content");
+
         return parseMove(content);
     }
 
     private String buildPrompt(String[][] board, char aiSymbol, char opponentSymbol) {
-        StringBuilder sb = new StringBuilder("You are the AI playing Tic Tac Toe as '" + aiSymbol + "'.\n");
-        sb.append("Here is the board:\n");
+        int n = board.length;
+        StringBuilder sb = new StringBuilder("You are the AI playing Tic Tac Toe as '")
+                .append(aiSymbol).append("'.\n");
+        sb.append("Board (use '.' for empty):\n");
         for (String[] row : board) {
-            for (String cell : row) {
-                sb.append(cell == null ? "." : cell).append(" ");
-            }
+            for (String cell : row) sb.append(cell == null ? "." : cell).append(" ");
             sb.append("\n");
         }
-        sb.append("Give your move as: row,col (e.g. 1,2)");
+        sb.append("The board is ").append(n).append("x").append(n).append(".\n");
+        sb.append("Rows and columns are 0-based (0..").append(n - 1).append(").\n");
+        sb.append("Return EXACTLY one move in the form: row,col  (e.g. 0,2)\n");
         return sb.toString();
     }
 
-    private int[] parseMove(String content) {
-        String[] parts = content.replaceAll("[^0-9,]", "").split(",");
 
-        if (parts.length != 2) {
+    private int[] parseMove(String content) {
+        java.util.regex.Matcher m =
+                java.util.regex.Pattern.compile("\\b(\\d+)\\s*,\\s*(\\d+)\\b").matcher(content);
+        if (!m.find()) {
             throw new IllegalArgumentException("Invalid move format from AI: " + content);
         }
-
-        int row = Integer.parseInt(parts[0].trim());
-        int col = Integer.parseInt(parts[1].trim());
-
+        int row = Integer.parseInt(m.group(1));
+        int col = Integer.parseInt(m.group(2));
         return new int[]{row, col};
     }
 

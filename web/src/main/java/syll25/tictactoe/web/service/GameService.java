@@ -16,9 +16,7 @@ import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class GameService {
@@ -26,11 +24,8 @@ public class GameService {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
     private OpenRouterClient openRouterClient;
-
-    public void setOpenRouterClient(OpenRouterClient openRouterClient) {
-        this.openRouterClient = openRouterClient;
-    }
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -98,7 +93,6 @@ public class GameService {
         Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
         Player player2 = new Player(stateDTO.getPlayer2().name(), stateDTO.getPlayer2().sign().charAt(0));
         Player currentPlayer = currentUsername.equals(player1.getName()) ? player1 : player2;
-
         for (int i = 0; i < stateDTO.getBoard().length; i++) {
             for (int j = 0; j < stateDTO.getBoard()[i].length; j++) {
                 if (stateDTO.getBoard()[i][j] != null) {
@@ -153,40 +147,61 @@ public class GameService {
 
     private void performAiMove(Board board, Player aiPlayer, StateDTO stateDTO, Game game) {
         try {
-            int[] move = openRouterClient.getBestMove(stateDTO.getBoard(), aiPlayer.getSymbol(), game.getPlayer1Symbol());
+            int[] move = openRouterClient.getBestMove(stateDTO.getBoard(),
+                    aiPlayer.getSymbol(), game.getPlayer1Symbol());
 
             board.placeSymbol(aiPlayer, move[0], move[1]);
-
-            if (board.isWinner(aiPlayer.getSymbol()).isPresent()) {
-                stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer(aiPlayer.getName());
-            } else if (board.isFull()) {
-                stateDTO.setGameOver(true);
-                stateDTO.setCurrentPlayer(aiPlayer.getName());
-            } else {
-                stateDTO.setCurrentPlayer(game.getPlayer1Name());
-            }
-
-            String[][] updatedBoard = new String[board.getSize()][board.getSize()];
-            Player[][] cells = board.getCells();
-            for (int x = 0; x < cells.length; x++) {
-                for (int y = 0; y < cells[x].length; y++) {
-                    if (cells[x][y] != null) {
-                        updatedBoard[x][y] = String.valueOf(cells[x][y].getSymbol());
-                    }
-                }
-            }
-
-            stateDTO.setBoard(updatedBoard);
-            game.setBoardState(stateToJson(stateDTO));
-            game.setGameOver(stateDTO.isGameOver());
-            game.setCurrentPlayer(stateDTO.getCurrentPlayer());
+            finalizeAIMoveAndPersist(board, aiPlayer, stateDTO, game);
 
         } catch (Exception e) {
             System.out.println("Failed");
-            makeAutoMove(stateDTO, board, aiPlayer);
+
+            int[] move = pickAnyEmptyCell(board);
+            if (move != null) {
+                board.placeSymbol(aiPlayer, move[0], move[1]);
+                finalizeAIMoveAndPersist(board, aiPlayer, stateDTO, game);
+            }
         }
     }
+
+    private void finalizeAIMoveAndPersist(Board board, Player aiPlayer, StateDTO stateDTO, Game game) {
+
+        if (board.isWinner(aiPlayer.getSymbol()).isPresent()) {
+            stateDTO.setGameOver(true);
+            stateDTO.setCurrentPlayer(aiPlayer.getName());
+        } else if (board.isFull()) {
+            stateDTO.setGameOver(true);
+            stateDTO.setCurrentPlayer(aiPlayer.getName());
+        } else {
+            stateDTO.setCurrentPlayer(game.getPlayer1Name());
+        }
+
+        String[][] updatedBoard = new String[board.getSize()][board.getSize()];
+        Player[][] cells = board.getCells();
+        for (int r = 0; r < cells.length; r++) {
+            for (int c = 0; c < cells[r].length; c++) {
+                if (cells[r][c] != null) {
+                    updatedBoard[r][c] = String.valueOf(cells[r][c].getSymbol());
+                }
+            }
+        }
+        stateDTO.setBoard(updatedBoard);
+
+        game.setBoardState(stateToJson(stateDTO));
+        game.setGameOver(stateDTO.isGameOver());
+        game.setCurrentPlayer(stateDTO.getCurrentPlayer());
+        gameRepository.save(game);
+    }
+
+    private int[] pickAnyEmptyCell(Board board) {
+        for (int r = 0; r < board.getSize(); r++) {
+            for (int c = 0; c < board.getSize(); c++) {
+                if (board.isCellEmpty(r, c)) return new int[]{r, c};
+            }
+        }
+        return null;
+    }
+
 
     public GameStateDTO loadGame(Long gameId) {
         Game game = gameRepository.findById(gameId)
@@ -276,22 +291,6 @@ public class GameService {
         return true;
     }
 
-    private void makeAutoMove(StateDTO stateDTO, Board board, Player player2) {
-
-        List<int[]> emptyCells = new ArrayList<>();
-
-        for (int i = 0; i < board.getSize(); i++) {
-            for (int j = 0; j < board.getSize(); j++) {
-                if (board.isCellEmpty(i, j)) {
-                    emptyCells.add(new int[]{i, j});
-                }
-            }
-        }
-        if (!emptyCells.isEmpty()) {
-            int[] move = emptyCells.get(new Random().nextInt(emptyCells.size()));
-            board.placeSymbol(player2, move[0], move[1]);
-        }
-    }
     public MoveResponseDTO getBestMoveForAI(Long gameId, String currentUsername) {
         Game game = getGameById(gameId);
 
@@ -317,6 +316,3 @@ public class GameService {
     }
 
 }
-
-
-
