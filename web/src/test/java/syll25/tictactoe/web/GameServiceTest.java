@@ -49,7 +49,7 @@ public class GameServiceTest {
             saveGame.setId(50L);
             return saveGame;
         });
-        Long gameId = gameService.startNewGame("Player1","Player2",3, "login1");
+        Long gameId = gameService.startNewGame("Player1","Player2",3, "login1", "");
         assertEquals(50L, gameId);
 
         verify(gameRepository).save(any(Game.class));

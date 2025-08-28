@@ -15,12 +15,11 @@ public class OpenRouterClient {
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
     private final String apiKey;
 
-    public OpenRouterClient() {
+    public OpenRouterClient(@org.springframework.beans.factory.annotation.Value("${openrouter.key-path}") String keyPath) {
         try {
-            Path keyPath = Path.of("/Users/sylwiabarteczko/Desktop/Pliki/TicTacToe/openrouter.key");
-            this.apiKey = Files.readString(keyPath).trim();
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot read OpenRouter API key", e);
+            this.apiKey = java.nio.file.Files.readString(java.nio.file.Path.of(keyPath)).trim();
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Cannot read OpenRouter API key from: " + keyPath, e);
         }
     }
 

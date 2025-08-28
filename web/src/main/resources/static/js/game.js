@@ -16,15 +16,16 @@ function setBoardDisabled(disabled) {
 
     table.querySelectorAll("button").forEach((btn) => {
         if (disabled) {
-         btn.disabled = true;
-         } else {
-         btn.disabled = btn.textContent !== "";
-    }
-});
+            btn.disabled = true;
+        } else {
+            btn.disabled = btn.textContent !== "";
+        }
+    });
 
     const overlay = getSafeElement("ai-thinking");
     if (overlay) overlay.style.display = disabled ? "block" : "none";
 }
+
 function updateGameState(response) {
     const { stateDTO, yourTurn, currentPlayer, gameOver } = response;
     const board = stateDTO.board;
@@ -113,17 +114,17 @@ function submitMove(button) {
                   });
               }
               return resp.json();
-            })
-            .then(updateGameState)
-            .catch((err) => {
-              alert("Move failed: " + err.message);
-              setBoardDisabled(false);
-              fetchGameState();
-            })
-            .finally(() => {
-              isMoveInFlight = false;
-            });
-        }
+        })
+        .then(updateGameState)
+        .catch((err) => {
+         alert("Move failed: " + err.message);
+         setBoardDisabled(false);
+         fetchGameState();
+         })
+        .finally(() => {
+         isMoveInFlight = false;
+         });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchGameState();

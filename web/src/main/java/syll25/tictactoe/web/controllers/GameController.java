@@ -50,10 +50,8 @@ public class GameController {
                                @RequestParam int boardSize,
                                @RequestParam String mode,
                                Principal principal) {
-        if ("AI".equals(mode)) {
-            player2Name = "Player";
-        }
-        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, principal.getName());
+
+        Long gameId = gameService.startNewGame(player1Name, player2Name, boardSize, principal.getName(), mode);
         return "redirect:/game/" + gameId;
     }
 

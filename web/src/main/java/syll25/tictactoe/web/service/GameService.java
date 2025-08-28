@@ -46,7 +46,14 @@ public class GameService {
     }
 
     @Transactional
-    public Long startNewGame(String player1Name, String player2Name, int boardSize, String player1Login) {
+    public Long startNewGame(String player1Name, String player2Name, int boardSize, String player1Login, String mode) {
+
+        boolean ai = "AI".equalsIgnoreCase(mode);
+        String p2Name = ai ? "AI" : player2Name;
+
+        if (!ai && (p2Name == null || p2Name.isBlank())) {
+            throw new IllegalArgumentException("Player 2 name is required for HUMAN mode");
+        }
 
         Board board = new Board(boardSize);
 
@@ -63,6 +70,7 @@ public class GameService {
         Game game = new Game(boardStateJson, player1.getName(), player1.getSymbol(), player2.getName(),
                 player2.getSymbol(), player1Login, null, currentPlayer.getName(), false);
 
+        game.setAi(ai);
         game.setCurrentPlayer(currentPlayer.getName());
         gameRepository.save(game);
 
@@ -132,9 +140,8 @@ public class GameService {
             game.setCurrentPlayer(stateDTO.getCurrentPlayer());
 
             if (!stateDTO.isGameOver()
-                    && game.getPlayer2Name().equals("Player")
-                    && stateDTO.getCurrentPlayer().equals("Player")) {
-
+                    && game.isAi()
+                    && stateDTO.getCurrentPlayer().equals(game.getPlayer2Name())) {
                 performAiMove(board, player2, stateDTO, game);
             }
             gameRepository.save(game);
@@ -313,6 +320,36 @@ public class GameService {
         StateDTO updatedState = makeMove(gameId, move[0], move[1], currentUsername);
         boolean yourTurn = updatedState.getCurrentPlayer().equals(currentUsername);
         return new MoveResponseDTO(updatedState, yourTurn);
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public boolean runAiTurnIfNeeded(Long gameId) {
+
+        Game game = gameRepository.lockById(gameId);
+
+        if (game.isGameOver() || !game.isAi())
+            return false;
+
+        StateDTO stateDTO = jsonToState(game.getBoardState());
+        if (!stateDTO.getCurrentPlayer().equals(game.getPlayer2Name()))
+            return false;
+
+        Board board = new Board(stateDTO.getSize());
+        Player player1 = new Player(stateDTO.getPlayer1().name(), stateDTO.getPlayer1().sign().charAt(0));
+        Player player2 = new Player(stateDTO.getPlayer2().name(), stateDTO.getPlayer2().sign().charAt(0));
+
+        String[][] boardShot = stateDTO.getBoard();
+        for (int row = 0; row < boardShot.length; row++) {
+            for (int col = 0; col < boardShot[row].length; col++) {
+                if (boardShot[row][col] != null) {
+                    char s = boardShot[row][col].charAt(0);
+                    board.placeSymbol(s == player1.getSymbol() ? player1 : player2, row, col);
+                }
+            }
+        }
+        performAiMove(board, player2, stateDTO, game);
+
+        return true;
     }
 
 }

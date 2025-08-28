@@ -46,6 +46,9 @@ public class Game {
     @Column
     private ZonedDateTime createdDate;
 
+    @Column (name = "is_ai", nullable = false)
+    private boolean ai;
+
     public Game() {
 
     }
@@ -178,5 +181,11 @@ public class Game {
 
     public void setPlayer2Login(String player2Login) {
         this.player2Login = player2Login;
+    }
+    public boolean isAi() {
+        return ai;
+    }
+    public void setAi(boolean ai) {
+        this.ai = ai;
     }
 }
