@@ -19,10 +19,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
             "ORDER BY g.createdDate DESC")
     List<Game> findByActiveGame();
 
-    @Query("SELECT g.id" +
-            "FROM Game g" +
-            "WHERE g.ai = true" +
-            "and g.gameOver = false" +
+    @Query("SELECT g.id " +
+            "FROM Game g " +
+            "WHERE g.isAi = true " +
+            "and g.gameOver = false " +
             "and g.currentPlayer = g.player2Name")
     List<Long> findIdsNeedingAiMove();
 

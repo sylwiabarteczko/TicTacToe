@@ -139,11 +139,6 @@ public class GameService {
             game.setGameOver(stateDTO.isGameOver());
             game.setCurrentPlayer(stateDTO.getCurrentPlayer());
 
-            if (!stateDTO.isGameOver()
-                    && game.isAi()
-                    && stateDTO.getCurrentPlayer().equals(game.getPlayer2Name())) {
-                performAiMove(board, player2, stateDTO, game);
-            }
             gameRepository.save(game);
             return stateDTO;
 
@@ -322,7 +317,6 @@ public class GameService {
         return new MoveResponseDTO(updatedState, yourTurn);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public boolean runAiTurnIfNeeded(Long gameId) {
 
         Game game = gameRepository.lockById(gameId);

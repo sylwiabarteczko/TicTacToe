@@ -21,11 +21,11 @@ public class AiMoveScheduler {
     }
     @Scheduled(fixedDelayString = "${ai.scheduler.delay-ms:500}", initialDelay = 500)
     public void checkAndPlayAiMoves() {
+        log.info("I'm working");
         List<Long> ids = gameRepository.findIdsNeedingAiMove();
         if (ids.isEmpty()) {
             return;
         }
-
         for (Long id : ids) {
             try {
                 boolean moved = gameService.runAiTurnIfNeeded(id);

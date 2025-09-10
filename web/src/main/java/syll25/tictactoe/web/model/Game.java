@@ -47,7 +47,7 @@ public class Game {
     private ZonedDateTime createdDate;
 
     @Column (name = "is_ai", nullable = false)
-    private boolean ai;
+    private boolean isAi;
 
     public Game() {
 
@@ -183,9 +183,9 @@ public class Game {
         this.player2Login = player2Login;
     }
     public boolean isAi() {
-        return ai;
+        return isAi;
     }
     public void setAi(boolean ai) {
-        this.ai = ai;
+        this.isAi = ai;
     }
 }
