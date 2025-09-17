@@ -1,4 +1,4 @@
-# Schemat blokowy projektu
+## 🧩 System Architecture Diagram
 
 ```plantuml
 @startuml
@@ -19,4 +19,4 @@ component Web
 @enduml
 ```
 
-Komponent `Logic` dostarcza mechanizmów serializacji pozwalających na zapis stanu gry do pliku, co jest wykorzystywane pośrednio przez `CLI`. Należy zwrócić uwagę, że komponent `Web` w celu utrwalenia stanu wykorzystuje bazę danych - w tym przypadku nie korzysta się z mechanizmów serializacji oferowanych przez `Logic`.
+The `Logic` component provides serialization mechanisms that allow saving the game state to a file, which is used indirectly by the `CLI` component. It is important to note that the `Web` component persists the state using the database — in this case, it does not rely on the serialization mechanisms offered by `Logic`.
