@@ -4,6 +4,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import syll25.tictactoe.web.repository.GameRepository;
 
 import java.util.List;
@@ -19,9 +20,10 @@ public class AiMoveScheduler {
         this.gameRepository = gameRepository;
         this.gameService = gameService;
     }
+    @Transactional
     @Scheduled(fixedDelayString = "${ai.scheduler.delay-ms:500}", initialDelay = 500)
     public void checkAndPlayAiMoves() {
-        log.info("I'm working");
+     //   log.info("I'm working");
         List<Long> ids = gameRepository.findIdsNeedingAiMove();
         if (ids.isEmpty()) {
             return;

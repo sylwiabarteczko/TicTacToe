@@ -11,15 +11,27 @@
     <p style="color: red;" th:text="${error}"></p>
 </div>
 
+<div style="display: inline-block; text-align: left;">
+
 <form th:action="@{/user/register}" method="post">
     <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
-
+    <input type="text" id="username" name="username" required>
+    <br><br>
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required><br>
 
+    <p style="font-size: 14px; color: #666; margin-top: 5px;">
+        Password must contain:<br>
+        • at least 8 characters<br>
+        • at least 1 lowercase letter<br>
+        • at least 1 uppercase letter<br>
+        • at least 1 digit<br>
+        • at least 1 special character (!@#$%^&*)
+    </p>
+    <br>
     <button type="submit">Register</button>
 </form>
+</div>
 
 <p>Already have an account? <a th:href="@{/user/login}">Login here</a></p>
 </body>
