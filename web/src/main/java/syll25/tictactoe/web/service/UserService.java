@@ -1,5 +1,6 @@
 package syll25.tictactoe.web.service;
 
+import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -41,13 +42,15 @@ public class UserService implements UserDetailsService {
     }
     private boolean isValidPassword(String password) {
 
-        boolean minLength   = password.length() >= 8;
-        boolean hasLower    = password.matches(".*[a-z].*");
-        boolean hasUpper    = password.matches(".*[A-Z].*");
-        boolean hasDigit    = password.matches(".*\\d.*");
-        boolean hasSpecial  = password.matches(".*[^a-zA-Z0-9].*");
+        PasswordValidator passwordValidation = new PasswordValidator(
+                new LengthRule(8),
+                new CharacterRule(EnglishCharacterData.LowerCase, 1),
+                new CharacterRule(EnglishCharacterData.UpperCase, 1),
+                new CharacterRule(EnglishCharacterData.Digit,1),
+                new CharacterRule(EnglishCharacterData.Special, 1)
+        );
+        RuleResult validate = passwordValidation.validate(new PasswordData(password));
 
-        return minLength && hasLower && hasUpper && hasDigit && hasSpecial;
+        return validate.isValid();
     }
-
 }

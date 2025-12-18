@@ -23,7 +23,7 @@ public class AiMoveScheduler {
     @Transactional
     @Scheduled(fixedDelayString = "${ai.scheduler.delay-ms:500}", initialDelay = 500)
     public void checkAndPlayAiMoves() {
-     //   log.info("I'm working");
+        log.debug("I'm working");
         List<Long> ids = gameRepository.findIdsNeedingAiMove();
         if (ids.isEmpty()) {
             return;
@@ -39,6 +39,5 @@ public class AiMoveScheduler {
             }
         }
     }
-
 
 }
