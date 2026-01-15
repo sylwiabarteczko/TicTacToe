@@ -26,7 +26,7 @@ public class MessageController {
     }
     @PostMapping("/send")
     public String send(@RequestParam String msg) {
-        producer.send("test-topic", msg);
+        producer.send("tictactoe.events", msg);
         return "sent: " + msg;
     }
     @PostMapping("/dev/user-registered")
