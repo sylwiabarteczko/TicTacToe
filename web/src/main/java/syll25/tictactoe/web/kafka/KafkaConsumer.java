@@ -10,4 +10,10 @@ public class KafkaConsumer {
     public void listen(String message) {
         System.out.println("Received message: " + message);
     }
+
+    /*producent zdarzen -> Kafka -> Report Service (konsument)
+    -> zapis do bazy danych
+    -> endpoint dla raportu
+    -> wykresy na frontendzie (JSON + wykresy)
+    */
 }
