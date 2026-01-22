@@ -1,5 +1,6 @@
 package syll25.tictactoe.web.kafka;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,17 +17,20 @@ import java.util.UUID;
 public class MessageController {
 
     private final KafkaProducer producer;
-
+    private final String topicFromProperties;
     private final EventPublisher publisher;
 
     public MessageController(KafkaProducer producer,
-                             EventPublisher publisher) {
+                             EventPublisher publisher,
+                             @Value("${tictactoe.kafka.topic}") String topicFromProperties) {
         this.producer = producer;
+        this.topicFromProperties = topicFromProperties;
         this.publisher = publisher;
+
     }
     @PostMapping("/send")
     public String send(@RequestParam String msg) {
-        producer.send("tictactoe.events", msg);
+        producer.send( topicFromProperties, msg);
         return "sent: " + msg;
     }
     @PostMapping("/dev/user-registered")
