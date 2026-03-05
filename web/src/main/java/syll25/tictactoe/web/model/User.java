@@ -19,6 +19,8 @@ public class User {
     @Version
     private Long version;
 
+    private int age;
+
     public Long getVersion() {
         return version;
     }
@@ -30,9 +32,10 @@ public class User {
     public User() {
 
     }
-    public User(String username, String password) {
+    public User(String username, String password, int age) {
         this.username = username;
         this.password = password;
+        this.age = age;
     }
     public String getPassword() {
         return password;
@@ -51,7 +54,7 @@ public class User {
     }
 
 
-
-
-
+    public int getAge() {
+        return age;
+    }
 }

@@ -11,12 +11,18 @@ import syll25.tictactoe.logic.CharacterPoolRandomizer;
 import syll25.tictactoe.logic.Player;
 import syll25.tictactoe.logic.exception.CellOccupiedException;
 import syll25.tictactoe.logic.state.StateDTO;
+import syll25.tictactoe.web.events.EventEnvelope;
+import syll25.tictactoe.web.events.EventType;
+import syll25.tictactoe.web.kafka.EventPublisher;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class GameService {
@@ -26,6 +32,9 @@ public class GameService {
 
     @Autowired
     private OpenRouterClient openRouterClient;
+
+    @Autowired
+    private EventPublisher eventPublisher;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -73,6 +82,15 @@ public class GameService {
         game.setAi(ai);
         game.setCurrentPlayer(currentPlayer.getName());
         gameRepository.save(game);
+
+        EventEnvelope event = new EventEnvelope(
+                UUID.randomUUID(),
+                EventType.GAME_CREATED,
+                Instant.now(),
+                1,
+                Map.of("gameId", game.getId(), "isAi", ai)
+        );
+        eventPublisher.publish(game.getId().toString(), event);
 
         return game.getId();
     }
@@ -140,6 +158,17 @@ public class GameService {
             game.setCurrentPlayer(stateDTO.getCurrentPlayer());
 
             gameRepository.save(game);
+
+            if (stateDTO.isGameOver()) {
+                EventEnvelope event = new EventEnvelope(
+                        UUID.randomUUID(),
+                        EventType.GAME_FINISHED,
+                        Instant.now(),
+                        1,
+                        Map.of("gameId", gameId, "winner", stateDTO.getCurrentPlayer())
+                );
+                eventPublisher.publish(gameId.toString(), event);
+            }
             return stateDTO;
 
         } catch (CellOccupiedException e) {
@@ -193,6 +222,17 @@ public class GameService {
         game.setGameOver(stateDTO.isGameOver());
         game.setCurrentPlayer(stateDTO.getCurrentPlayer());
         gameRepository.save(game);
+
+        if (stateDTO.isGameOver()) {
+            EventEnvelope event = new EventEnvelope(
+                    UUID.randomUUID(),
+                    EventType.GAME_FINISHED,
+                    Instant.now(),
+                    1,
+                    Map.of("gameId", game.getId(), "winner", stateDTO.getCurrentPlayer())
+            );
+            eventPublisher.publish(game.getId().toString(), event);
+        }
     }
 
     private int[] pickAnyEmptyCell(Board board) {

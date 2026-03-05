@@ -22,12 +22,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestParam String username, @RequestParam String password, Model model) {
+    public String register(@RequestParam String username, @RequestParam String password,@RequestParam int age, Model model) {
         try {
-            userService.register(username, password);
+            userService.register(username, password, age);
             return "redirect:/user/login?registered";
         } catch (Exception e) {
-            model.addAttribute("error", "Registration failed, try again.");
+            model.addAttribute("error", e.getMessage());
         } return "registration";
     }
 

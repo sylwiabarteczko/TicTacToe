@@ -7,4 +7,5 @@ public enum EventType {
     MOVE_MADE,
     GAME_FINISHED,
     AI_ERROR
+
 }

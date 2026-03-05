@@ -10,5 +10,6 @@ public record EventEnvelope(
         Instant occurredAt,
         int schemaVersion,
         Map<String, Object> payload
+
 ) {
 }

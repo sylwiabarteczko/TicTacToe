@@ -34,7 +34,7 @@ public class UserServiceTest {
 
         when(encoder.encode(rawPassword)).thenReturn(encodedPassword);
 
-        userService.register("Sylwia", rawPassword);
+        userService.register("Sylwia", rawPassword, 25);
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());
