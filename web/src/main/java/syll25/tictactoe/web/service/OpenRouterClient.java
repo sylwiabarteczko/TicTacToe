@@ -1,5 +1,6 @@
 package syll25.tictactoe.web.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
@@ -15,12 +16,19 @@ public class OpenRouterClient {
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
     private final String apiKey;
 
-    public OpenRouterClient(@org.springframework.beans.factory.annotation.Value("${openrouter.key-path}") String keyPath) {
-        try {
-            this.apiKey = java.nio.file.Files.readString(java.nio.file.Path.of(keyPath)).trim();
-        } catch (java.io.IOException e) {
-            throw new IllegalStateException("Cannot read OpenRouter API key from: " + keyPath, e);
+    public OpenRouterClient(@Value("${openrouter.key-path:}") String keyPath) {
+        if (keyPath == null || keyPath.isBlank()) {
+            this.apiKey = null;
+        } else {
+            try {
+                this.apiKey = Files.readString(Path.of(keyPath)).trim();
+            } catch (IOException e) {
+                throw new IllegalStateException("Cannot read OpenRouter API key from: " + keyPath, e);
+            }
         }
+    }
+    public boolean isAvailable() {
+        return apiKey != null;
     }
 
     public int[] getBestMove(String[][] board, char aiSymbol, char opponentSymbol) {

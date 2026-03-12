@@ -1,59 +1,80 @@
-# Główne założenia
+# TicTacToe – Backend
 
-Moduł `web` wykorzystuje moduł `logic` w zakresie logiki gry oraz przechowywania stanu gry. W celu utrwalenia stanu (przyjmuje się serializację do JSONa), dodatkowo stosuje się bazę danych PostgreSQL.
+A Spring Boot web application for playing Tic Tac Toe. Supports human vs human and human vs AI game modes using the OpenRouter API.
 
-# Diagram przepływu
+## Architecture
 
-```plantuml
-@startuml
-|Klient|
-start
-:`GET /game/new`;
-|Web|
-:Przygotowanie widoku `newGame`;
-|Klient|
-:Przedstawienie widoku 'newGame';
-:Wprowadzenie nazw graczy i rozmiaru planszy;
-:`POST /game/start`;
-|Web|
-:Przygotowanie gry;
-|Logic|
-:Przygotowanie planszy - klasa GameBoard;
-:Losowanie znaków graczy - klasa CharacterPoolRandomizer;
-:Przygotowanie graczy - klasa Player;
-:Przygotowanie stanu gry - klasa StateDTO;
-|Web|
-:Serializacja stanu gry;
-|Database|
-:Utrwalenie stanu gry;
-floating note right: nadanie id 
-|Web|
-:Redirect 302 do `/game/:id`;
-|Klient|
-:`GET /game/:id`;
-|Web|
-:Pobranie gry z bazy na podstawie id;
-|Database|
-:Pobranie gry;
-|Web|
-:Deserializacja do StateDto;
-:Przygotowanie widoku `game`;
-|Klient|
-:Przedstawienie widoku `game`;
-:Wykonanie ruchu;
-:`POST /game/move`;
-|Web|
-:Pobranie gry z bazy na podstawie id;
-|Database|
-:Pobranie gry;
-|Web|
-:Deserializacja do StateDto;
-|Logic|
-:Wykonanie ruchu;
-|Web|
-:Przygotowanie widoku `game`;
-|Klient|
-:Przedstawienie widoku `game`;
-floating note right: Gracze kontynuują grę j/w
-@enduml
+The project consists of three modules:
+
+- `logic` – game logic (board, players, game state)
+- `web` – web layer (REST API, database, Kafka)
+- `TicTacToeReportingService` – separate service collecting statistics from Kafka events
+
+The `web` module uses the `logic` module for game logic and state management. Game state is serialized to JSON and persisted in PostgreSQL.
+
+## Requirements
+
+- Java 21
+- Maven
+- Docker (for PostgreSQL, Kafka, Zookeeper)
+- OpenRouter API key *(optional – required only for AI game mode)*
+
+## Setup
+
+### 1. Start infrastructure (Docker)
+```bash
+cd TicTacToe-Infrastructure
+docker-compose up -d
 ```
+
+Starts:
+- PostgreSQL on port `5434`
+- Kafka on port `9092`
+- Zookeeper on port `2181`
+
+### 2. Configure application.properties
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5434/tic-tac-toe
+spring.datasource.username=tic-tac-toe
+spring.datasource.password=mysecretpassword
+
+spring.kafka.bootstrap-servers=localhost:9092
+
+# Optional – required only for AI game mode
+# openrouter.key-path=/path/to/openrouter.key
+```
+
+If `openrouter.key-path` is not set, the app starts normally but AI game mode will be unavailable.
+
+### 3. Run the application
+```bash
+cd web
+mvn spring-boot:run
+```
+
+Available at: `http://localhost:8080`
+
+### 4. (Optional) Run ReportingService
+```bash
+cd TicTacToeReportingService
+mvn spring-boot:run
+```
+
+Available at: `http://localhost:8081`
+
+## Game modes
+
+| Mode | Description | Requirements |
+|------|-------------|--------------|
+| Human vs Human | Two players on one device | None |
+| Human vs AI | Player vs AI (OpenRouter) | OpenRouter API key |
+
+## Kafka events
+
+The app publishes events to the `tictactoe.events` topic:
+
+| Event | When |
+|-------|------|
+| `USER_REGISTERED` | User registers |
+| `GAME_CREATED` | New game is created |
+| `GAME_FINISHED` | Game ends |

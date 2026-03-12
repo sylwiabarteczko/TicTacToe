@@ -23,6 +23,10 @@
         <label for="boardSize">Board Size:</label>
         <input type="number" id="boardSize" name="boardSize" min="3" max="10" value="3" required>
 
+        <div th:if="${mode == 'AI' and !aiAvailable}">
+            <p style="color: red;">AI mode is unavailable – OpenRouter API key not configured.</p>
+        </div>
+
         <button type="submit">Start Game</button>
     </form>
 </div>

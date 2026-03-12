@@ -64,6 +64,10 @@ public class GameService {
             throw new IllegalArgumentException("Player 2 name is required for HUMAN mode");
         }
 
+        if (ai && !openRouterClient.isAvailable()) {
+            throw new IllegalArgumentException("AI mode is not available - OpenRouter key not configured");
+        }
+
         Board board = new Board(boardSize);
 
         CharacterPoolRandomizer symbolChoice = new CharacterPoolRandomizer('X', 'O');

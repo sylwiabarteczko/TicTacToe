@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
     private boolean isValidPassword(String password) {
 
         PasswordValidator passwordValidation = new PasswordValidator(
-                new LengthRule(8),
+                new LengthRule(8, 128),
                 new CharacterRule(EnglishCharacterData.LowerCase, 1),
                 new CharacterRule(EnglishCharacterData.UpperCase, 1),
                 new CharacterRule(EnglishCharacterData.Digit,1),

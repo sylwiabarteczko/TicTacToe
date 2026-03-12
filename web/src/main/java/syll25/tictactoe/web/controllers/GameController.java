@@ -11,6 +11,7 @@ import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.service.GameService;
 import syll25.tictactoe.web.service.GameViewService;
+import syll25.tictactoe.web.service.OpenRouterClient;
 
 import java.util.List;
 import java.security.Principal;
@@ -20,12 +21,14 @@ import java.security.Principal;
 public class GameController {
     private final GameService gameService;
     private final GameViewService gameViewService;
+    private final OpenRouterClient openRouterClient;
 
     @Autowired
-    public GameController(GameService gameService, GameViewService gameViewService) {
+    public GameController(GameService gameService, GameViewService gameViewService, OpenRouterClient openRouterClient) {
 
         this.gameService = gameService;
         this.gameViewService = gameViewService;
+        this.openRouterClient = openRouterClient;
     }
 
     @GetMapping("/list-games")
@@ -41,6 +44,7 @@ public class GameController {
             return "choosePlayer";
         }
         model.addAttribute("mode", mode);
+        model.addAttribute("aiAvailable", openRouterClient.isAvailable());
         return "newGame";
     }
 
