@@ -36,7 +36,7 @@ Starts:
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5434/tic-tac-toe
 spring.datasource.username=tic-tac-toe
-spring.datasource.password=mysecretpassword
+spring.datasource.password=/your/password/
 
 spring.kafka.bootstrap-servers=localhost:9092
 
