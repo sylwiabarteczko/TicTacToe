@@ -121,5 +121,9 @@ td button:hover:not(:disabled) {
     50% { opacity: 0.5; }
     100% { opacity: 1; }
 }
+.ai-unavailable {
+    display: inline-block;
+    vertical-align: top;
+}
 
 

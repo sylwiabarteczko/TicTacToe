@@ -10,7 +10,6 @@ import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.model.MoveResponseDTO;
 import syll25.tictactoe.web.service.GameService;
-import syll25.tictactoe.web.service.GameViewService;
 import syll25.tictactoe.web.service.OpenRouterClient;
 
 import java.util.List;
@@ -20,14 +19,12 @@ import java.security.Principal;
 @RequestMapping("/game")
 public class GameController {
     private final GameService gameService;
-    private final GameViewService gameViewService;
     private final OpenRouterClient openRouterClient;
 
     @Autowired
-    public GameController(GameService gameService, GameViewService gameViewService, OpenRouterClient openRouterClient) {
+    public GameController(GameService gameService, OpenRouterClient openRouterClient) {
 
         this.gameService = gameService;
-        this.gameViewService = gameViewService;
         this.openRouterClient = openRouterClient;
     }
 
@@ -35,12 +32,14 @@ public class GameController {
     public String listGames(Model model) {
         List<Game> activeGames = gameService.listActiveGames();
         model.addAttribute("games", activeGames);
+        model.addAttribute("aiAvailable", openRouterClient.isAvailable());
         return "gameList";
     }
 
     @GetMapping("/new")
     public String newGameForm(@RequestParam(name = "mode", required = false) String mode, Model model) {
         if (mode == null) {
+            model.addAttribute("aiAvailable", openRouterClient.isAvailable());
             return "choosePlayer";
         }
         model.addAttribute("mode", mode);

@@ -17,14 +17,22 @@ public class OpenRouterClient {
     private final String apiKey;
 
     public OpenRouterClient(@Value("${openrouter.key-path:}") String keyPath) {
+
         if (keyPath == null || keyPath.isBlank()) {
             this.apiKey = null;
+            System.out.println(">>> apiKey = null (no path)");
         } else {
+            String key = null;
             try {
-                this.apiKey = Files.readString(Path.of(keyPath)).trim();
+                key = Files.readString(Path.of(keyPath)).trim();
+                System.out.println(">>> apiKey loaded, length = " + key.length());
+                System.out.println(">>> apiKey is blank: " + key.isBlank());
             } catch (IOException e) {
+                System.out.println(">>> IOException: " + e.getMessage());
                 throw new IllegalStateException("Cannot read OpenRouter API key from: " + keyPath, e);
             }
+            this.apiKey = key.isBlank() ? null : key;
+            System.out.println(">>> isAvailable = " + (this.apiKey != null));
         }
     }
     public boolean isAvailable() {

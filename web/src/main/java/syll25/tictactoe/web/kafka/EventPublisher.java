@@ -28,6 +28,6 @@ public class EventPublisher {
             kafkaTemplate.send(topic, key, json);
         } catch (Exception e) {
             System.err.println("Kafka publish error: " + e.getMessage());
-        } // przekazac event envelope
+        }
     }
 }

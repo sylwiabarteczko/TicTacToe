@@ -31,13 +31,20 @@
 <div style="margin-top: 30px;">
     <form th:action="@{/game/new}" method="get" style="display: inline;">
         <input type="hidden" name="mode" value="HUMAN"/>
-        <button type="submit" class="button">💁🏼 New Game vs Player</button>
+        <button type="submit">💁🏼 New Game vs Player</button>
     </form>
 
-    <form th:action="@{/game/new}" method="get" style="display: inline; margin-left: 10px;">
+    <form th:if="${aiAvailable}" th:action="@{/game/new}" method="get" style="display: inline;">
         <input type="hidden" name="mode" value="AI"/>
-        <button type="submit" class="button">🤖 New Game vs AI</button>
+        <button type="submit">🤖 New Game vs AI</button>
     </form>
+
+    <div th:unless="${aiAvailable}" class="ai-unavailable">
+        <button disabled>🤖 New Game vs AI</button>
+        <p class="turn-message">
+            Requires an <a href="https://openrouter.ai" target="_blank">OpenRouter API key</a>
+        </p>
+    </div>
 </div>
 
 </body>
