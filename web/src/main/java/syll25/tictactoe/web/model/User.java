@@ -21,6 +21,7 @@ public class User {
 
     private int age;
 
+
     public Long getVersion() {
         return version;
     }
@@ -56,5 +57,8 @@ public class User {
 
     public int getAge() {
         return age;
+    }
+    public Long getId() {
+        return id;
     }
 }

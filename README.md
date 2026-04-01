@@ -85,4 +85,5 @@ The app publishes events to the `tictactoe.events` topic:
 |-------|------|
 | `USER_REGISTERED` | User registers |
 | `GAME_CREATED` | New game is created |
+| `MOVE_MADE` | A move is made (by player or AI) |
 | `GAME_FINISHED` | Game ends |

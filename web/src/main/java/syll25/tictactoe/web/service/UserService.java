@@ -33,7 +33,6 @@ public class UserService implements UserDetailsService {
         if (!isValidPassword(rawPassword)) {
             throw new IllegalArgumentException("Password does not meet required rules.");
         }
-
         String hashedPassword = passwordEncoder.encode(rawPassword);
         User user = new User(username, hashedPassword, age);
         userRepository.save(user);
@@ -43,12 +42,9 @@ public class UserService implements UserDetailsService {
                 EventType.USER_REGISTERED,
                 Instant.now(),
                 1,
-                Map.of("username", username, "age", age)
+                Map.of("userId", user.getId(), "age", age)
         );
-        eventPublisher.publish(username, event);
-        // tu powinien byc wrzucony event na kafke (zawiera informacje o wieku)
-        //instancja event envelope, wypelniasz event type i wiek, obiekt event envelope, przekaze go do event publishera i stad zawolam
-        //publishera i mu przekaze obiekt
+        eventPublisher.publish(user.getId().toString(), event);
     }
 
     @Override

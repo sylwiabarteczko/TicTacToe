@@ -7,10 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import syll25.tictactoe.logic.state.StateDTO;
+import syll25.tictactoe.web.kafka.EventPublisher;
 import syll25.tictactoe.web.model.Game;
 import syll25.tictactoe.web.model.GameStateDTO;
 import syll25.tictactoe.web.repository.GameRepository;
 import syll25.tictactoe.web.service.GameService;
+import syll25.tictactoe.web.service.OpenRouterClient;
 
 import java.util.Optional;
 
@@ -27,6 +29,10 @@ public class GameServiceTest {
     @Mock
     private GameRepository gameRepository;
     private Game mockGame;
+    @Mock
+    private EventPublisher eventPublisher;
+    @Mock
+    private OpenRouterClient openRouterClient;
 
     @BeforeEach
     void setUp() {
@@ -107,4 +113,15 @@ public class GameServiceTest {
         assertEquals("Player2", gameStateDTO.getStateDTO().getPlayer2().name());
     }
 
+    @Test
+    void shouldThrowExceptionWhenAiModeAndOpenRouterNotAvailable() {
+        when(openRouterClient.isAvailable()).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> gameService.startNewGame("Alice", null, 3, "alice", "AI")
+        );
+
+        assertEquals("AI mode is not available - OpenRouter key not configured", exception.getMessage());
+    }
 }

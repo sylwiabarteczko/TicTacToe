@@ -163,15 +163,10 @@ public class GameService {
 
             gameRepository.save(game);
 
+            publishMoveMadeEvent(gameId);
+
             if (stateDTO.isGameOver()) {
-                EventEnvelope event = new EventEnvelope(
-                        UUID.randomUUID(),
-                        EventType.GAME_FINISHED,
-                        Instant.now(),
-                        1,
-                        Map.of("gameId", gameId, "winner", stateDTO.getCurrentPlayer())
-                );
-                eventPublisher.publish(gameId.toString(), event);
+                publishGameFinishedEvent(game.getId(), stateDTO.getCurrentPlayer());
             }
             return stateDTO;
 
@@ -179,7 +174,26 @@ public class GameService {
             throw new CellOccupiedException();
         }
     }
-
+    private void publishGameFinishedEvent(Long gameId, String winner) {
+        EventEnvelope event = new EventEnvelope(
+                UUID.randomUUID(),
+                EventType.GAME_FINISHED,
+                Instant.now(),
+                1,
+                Map.of("gameId", gameId, "winner", winner)
+        );
+        eventPublisher.publish(gameId.toString(), event);
+    }
+    private void publishMoveMadeEvent(Long gameId) {
+        EventEnvelope event = new EventEnvelope(
+                UUID.randomUUID(),
+                EventType.MOVE_MADE,
+                Instant.now(),
+                1,
+                Map.of("gameId", gameId)
+        );
+        eventPublisher.publish(gameId.toString(), event);
+    }
     private void performAiMove(Board board, Player aiPlayer, StateDTO stateDTO, Game game) {
         try {
             int[] move = openRouterClient.getBestMove(stateDTO.getBoard(),
@@ -226,16 +240,10 @@ public class GameService {
         game.setGameOver(stateDTO.isGameOver());
         game.setCurrentPlayer(stateDTO.getCurrentPlayer());
         gameRepository.save(game);
+        publishMoveMadeEvent(game.getId());
 
         if (stateDTO.isGameOver()) {
-            EventEnvelope event = new EventEnvelope(
-                    UUID.randomUUID(),
-                    EventType.GAME_FINISHED,
-                    Instant.now(),
-                    1,
-                    Map.of("gameId", game.getId(), "winner", stateDTO.getCurrentPlayer())
-            );
-            eventPublisher.publish(game.getId().toString(), event);
+            publishGameFinishedEvent(game.getId(), stateDTO.getCurrentPlayer());
         }
     }
 
