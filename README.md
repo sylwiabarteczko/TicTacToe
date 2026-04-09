@@ -12,6 +12,8 @@ The project consists of three modules:
 
 The `web` module uses the `logic` module for game logic and state management. Game state is serialized to JSON and persisted in PostgreSQL.
 
+![Demo](https://raw.githubusercontent.com/sirmalloc/ccstatusline/main/screenshots/demo.gif)
+
 ## Requirements
 
 - Java 21
@@ -87,3 +89,9 @@ The app publishes events to the `tictactoe.events` topic:
 | `GAME_CREATED` | New game is created |
 | `MOVE_MADE` | A move is made (by player or AI) |
 | `GAME_FINISHED` | Game ends |
+
+## Screenshots
+
+![Login](https://github.com/sylwiabarteczko/TicTacToe/blob/auto-ai/web/Login.png)
+![Register](dhttps://github.com/sylwiabarteczko/TicTacToe/blob/auto-ai/web/Register.png)
+![Game](https://github.com/sylwiabarteczko/TicTacToe/blob/auto-ai/web/Game.png)
