@@ -91,16 +91,16 @@ The app publishes events to the `tictactoe.events` topic:
 ## Screenshots
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Login.png" width="50%" />
   <br/><em>Login page</em>
+  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Login.png" width="50%" />
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Register.png" width="50%" />
   <br/><em>Registration page</em>
+  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Register.png" width="50%" />
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Game.png" width="50%" />
   <br/><em>Game board</em>
+  <img src="https://raw.githubusercontent.com/sylwiabarteczko/TicTacToe/auto-ai/web/Game.png" width="50%" />
 </p>
